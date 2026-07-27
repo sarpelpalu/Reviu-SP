@@ -17,7 +17,6 @@
         .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; }
         .bento-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(59, 130, 246, 0.15); border-color: #bfdbfe; }
         
-        /* Custom Scrollbar for the SP Cards */
         .sp-content-scroll::-webkit-scrollbar { width: 6px; }
         .sp-content-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .sp-content-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -30,23 +29,23 @@
         .loader { border: 3px solid #f1f5f9; border-top: 3px solid #3b82f6; border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Custom Radio Form Review */
         .status-radio input:checked + div { background-color: #eff6ff; border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
         .status-radio input:checked + div span.radio-dot { background-color: #3b82f6; border-color: #3b82f6; }
         
         .textarea-collapse { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; overflow: hidden; max-height: 0; opacity: 0; }
         .textarea-collapse.show { max-height: 200px; opacity: 1; margin-top: 0.75rem; }
+
+        /* Canvas Signature Styling */
+        #signature-pad { border: 2px dashed #cbd5e1; border-radius: 0.75rem; background-color: #ffffff; cursor: crosshair; touch-action: none; width: 100%; height: 200px; }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- GLOBAL LOADER -->
     <div id="global-loader" class="fixed inset-0 bg-slate-50/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center hidden">
         <div class="loader w-12 h-12 border-4 mb-4"></div>
         <p class="font-semibold text-slate-600 tracking-wide" id="loader-text">Memproses...</p>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-300 opacity-0 pointer-events-none">
         <div class="glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg" id="toast-content">
             <i class="fas fa-info-circle text-blue-500"></i> <span id="toast-msg">Notifikasi</span>
@@ -70,7 +69,6 @@
                 <button onclick="switchLoginTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all">Tim Internal</button>
             </div>
 
-            <!-- FORM STAKEHOLDER (Diperbarui dengan 3 Isian) -->
             <div id="form-stakeholder">
                 <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 mb-5">
                     <p class="text-xs text-blue-800 text-center leading-relaxed">Sistem Akses Terbuka. Mohon lengkapi profil Anda sebelum mereviu Standar Pelayanan.</p>
@@ -94,7 +92,6 @@
                 <button onclick="loginStakeholder()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">Mulai Reviu <i class="fas fa-arrow-right text-sm"></i></button>
             </div>
 
-            <!-- FORM ADMIN -->
             <div id="form-admin" class="hidden">
                 <div class="mb-4"><label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 uppercase tracking-wider">Email Admin</label><input type="email" id="admin-email" placeholder="admin@balmonpalu.go.id" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/60"></div>
                 <div class="mb-6"><label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 uppercase tracking-wider">Password</label><input type="password" id="admin-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/60"></div>
@@ -123,17 +120,19 @@
         </nav>
     </div>
 
+    <!-- 3. SCRIPT LOGIC -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
-        // 1. CONFIG FIREBASE (Ubah IS_PREVIEW = false saat live)
+        // CONFIG FIREBASE (Ubah IS_PREVIEW = false saat live)
         // ==========================================
         let IS_PREVIEW = false; 
         
-      const firebaseConfig = {
+       const firebaseConfig = {
   apiKey: "AIzaSyDFxaM-yDYs_dlHfspUdbVk2akceTiGRII",
   authDomain: "reviu-sp.firebaseapp.com",
   projectId: "reviu-sp",
@@ -156,13 +155,10 @@
             IS_PREVIEW = true;
         }
 
-        // ==========================================
-        // 2. DATA LAYANAN SESUAI PDF (DOKUMEN SP) No. 2 - 14
-        // ==========================================
         const layananData = {
             'SP-01': {
                 judul: 'Asistensi & Konsultasi Perizinan SFR',
-                deskripsi: 'SK No 40 Tahun 2023 - Pelayanan asistensi perizinan spektrum frekuensi radio.',
+                deskripsi: 'SK No 40 Tahun 2023 - Pelayanan asistensi perizinan spektrum frekuensi radio dan sertifikasi operator radio.',
                 icon: 'fa-user-tie',
                 tema: { border: 'border-blue-500', bg: 'bg-blue-100', text: 'text-blue-600', ring: 'focus:ring-blue-500' },
                 komponen: [
@@ -182,7 +178,7 @@
                 ]
             },
             'SP-02': {
-                judul: 'Penyelenggaraan Ujian Negara Amatir Radio (UNAR) dan sertifikasi operator radio',
+                judul: 'Penyelenggaraan Ujian Negara Amatir Radio (UNAR) dan Sertifikasi Operator Radio',
                 deskripsi: 'SK No 41 Tahun 2023 - Pelaksanaan ujian negara bagi calon amatir radio menggunakan sistem CAT.',
                 icon: 'fa-laptop-code',
                 tema: { border: 'border-purple-500', bg: 'bg-purple-100', text: 'text-purple-600', ring: 'focus:ring-purple-500' },
@@ -226,27 +222,16 @@
         };
 
         const komponenSPNames = [
-            "Persyaratan Pelayanan",
-            "Sistem, Mekanisme, dan Prosedur",
-            "Jangka Waktu Penyelesaian",
-            "Biaya / Tarif",
-            "Produk Pelayanan",
-            "Sarana, Prasarana, dan/atau Fasilitas",
-            "Kompetensi Pelaksana",
-            "Pengawas Internal",
-            "Penanganan Pengaduan, Saran, dan Masukan",
-            "Jumlah Pelaksana",
-            "Jaminan Pelayanan",
-            "Jaminan Keamanan dan Keselamatan Pelayanan",
+            "Persyaratan Pelayanan", "Sistem, Mekanisme, dan Prosedur", "Jangka Waktu Penyelesaian",
+            "Biaya / Tarif", "Produk Pelayanan", "Sarana, Prasarana, dan/atau Fasilitas",
+            "Kompetensi Pelaksana", "Pengawas Internal", "Penanganan Pengaduan, Saran, dan Masukan",
+            "Jumlah Pelaksana", "Jaminan Pelayanan", "Jaminan Keamanan dan Keselamatan Pelayanan",
             "Evaluasi Kinerja Pelaksana"
         ];
 
-
-        // ==========================================
-        // 3. UI UTILITIES & STATE
-        // ==========================================
         let currentUserRole = null;
         let stakeholderData = { nama: '', jabatan: '', instansi: '' };
+        let signaturePad = null; // Variable for signature pad
 
         window.showLoader = (msg='Memproses') => { document.getElementById('loader-text').innerText=msg; document.getElementById('global-loader').classList.remove('hidden'); }
         window.hideLoader = () => { document.getElementById('global-loader').classList.add('hidden'); }
@@ -271,7 +256,7 @@
             const jabatan = document.getElementById('sh-jabatan').value.trim();
             const instansi = document.getElementById('sh-instansi').value.trim();
             
-            if(!nama || !jabatan || !instansi) return showToast('Mohon lengkapi semua isian (Nama, Jabatan, Instansi).', 'error');
+            if(!nama || !jabatan || !instansi) return showToast('Mohon lengkapi semua isian profil.', 'error');
             
             stakeholderData = { nama, jabatan, instansi };
             currentUserRole = 'stakeholder';
@@ -325,9 +310,6 @@
             renderPageContent(pageId);
         };
 
-        // ==========================================
-        // 4. RENDERER (UI/UX)
-        // ==========================================
         const renderPageContent = (pageId) => {
             const content = document.getElementById('content-area');
             let html = '';
@@ -344,8 +326,6 @@
                         <div class="grid gap-6 md:grid-cols-3 mb-10 items-stretch">
                             ${Object.keys(layananData).map(k => `
                                 <div class="glass-card bento-hover p-6 rounded-[24px] ${layananData[k].tema.border} border-t-4 flex flex-col h-[600px] bg-white relative overflow-hidden group">
-                                    
-                                    <!-- Header Card -->
                                     <div class="flex justify-between items-start mb-4 flex-shrink-0">
                                         <div class="w-12 h-12 ${layananData[k].tema.bg} rounded-2xl flex items-center justify-center ${layananData[k].tema.text} text-xl group-hover:scale-110 transition-transform"><i class="fas ${layananData[k].icon}"></i></div>
                                         <span class="bg-slate-100 text-slate-500 text-xs font-bold px-2 py-1 rounded">${k}</span>
@@ -353,7 +333,6 @@
                                     <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2 flex-shrink-0">${layananData[k].judul}</h3>
                                     <p class="text-[11px] text-blue-600 font-semibold mb-4 border-b pb-3 flex-shrink-0">${layananData[k].deskripsi}</p>
                                     
-                                    <!-- Scrollable Content for SP Components 2-14 -->
                                     <div class="space-y-4 flex-1 overflow-y-auto pr-2 sp-content-scroll pb-4">
                                         ${layananData[k].komponen.map(komp => `
                                             <div>
@@ -362,8 +341,6 @@
                                             </div>
                                         `).join('')}
                                     </div>
-                                    
-                                    <!-- Gradient indicator for scrolling -->
                                     <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none rounded-b-[24px]"></div>
                                 </div>
                             `).join('')}
@@ -394,14 +371,24 @@
                         <div id="q-container"></div>
 
                         <div id="final-container" class="hidden glass-card p-6 md:p-8 mb-8 rounded-[24px]">
-                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">3</div><div><h3 class="font-bold text-xl text-slate-800">Kesimpulan Akhir Reviu</h3></div></div>
+                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">3</div><div><h3 class="font-bold text-xl text-slate-800">Kesimpulan & Tanda Tangan</h3></div></div>
                             <div class="space-y-6 pl-14 mb-8">
                                 <div><label class="block text-sm font-semibold mb-2 text-slate-700">Secara umum, bagian mana yang sudah baik dan patut dipertahankan?</label><textarea id="essay_baik" rows="2" class="w-full p-4 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
                                 <div><label class="block text-sm font-semibold mb-2 text-slate-700">Kesimpulan atau catatan penutup dari Anda terkait Standar Pelayanan ini?</label><textarea id="essay_usulan" rows="3" class="w-full p-4 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
                             </div>
-                            <div class="bg-blue-50 p-6 rounded-2xl border-blue-100 pl-14 ml-14">
+                            
+                            <div class="bg-blue-50 p-6 rounded-2xl border-blue-100 pl-14 ml-14 mb-8">
                                 <label class="block font-bold text-blue-900 mb-4">Status Pengesahan Stakeholder terhadap Dokumen SP:</label>
                                 ${['Disetujui tanpa perubahan', 'Disetujui dengan catatan penyesuaian', 'Perlu dilakukan perubahan/revisi mendalam'].map(v => `<label class="flex items-center gap-3 cursor-pointer p-3 bg-white mb-2 border border-blue-100 hover:border-blue-300 rounded-xl transition-colors"><input type="radio" name="kesimpulan" value="${v}" class="w-4 h-4 text-blue-600"><span class="font-semibold text-blue-900">${v}</span></label>`).join('')}
+                            </div>
+
+                            <div class="pl-14">
+                                <label class="block text-sm font-semibold mb-2 text-slate-700">Tanda Tangan Digital Stakeholder</label>
+                                <p class="text-xs text-slate-500 mb-3">Silakan goreskan tanda tangan Anda pada kotak di bawah ini sebagai bentuk pengesahan.</p>
+                                <div class="relative">
+                                    <canvas id="signature-pad"></canvas>
+                                    <button onclick="clearSignature()" class="absolute top-2 right-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded text-xs font-semibold transition-colors">Hapus</button>
+                                </div>
                             </div>
                         </div>
 
@@ -412,17 +399,29 @@
             else if (pageId === 'hasil-review') {
                 html = `
                     <div class="p-6 md:p-10 h-full flex flex-col"><div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-extrabold text-slate-900">Rekapitulasi Reviu SP</h2><button onclick="window.exportToCSV()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-green-700"><i class="fas fa-file-csv"></i> Ekspor CSV Detail</button></div>
-                    <div class="glass-card flex-1 overflow-auto shadow-sm rounded-2xl border-t-4 border-indigo-500"><table class="w-full text-left"><thead class="bg-slate-50 text-slate-600 border-b text-sm"><th class="p-4">Profil Stakeholder</th><th class="p-4">Layanan Direviu</th><th class="p-4">Kesimpulan / Status</th><th class="p-4 text-center">Waktu Submit</th></thead>
-                    <tbody id="table-reviews" class="divide-y divide-slate-100"><tr><td colspan="4" class="p-8 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div></div>
+                    <div class="glass-card flex-1 overflow-auto shadow-sm rounded-2xl border-t-4 border-indigo-500"><table class="w-full text-left"><thead class="bg-slate-50 text-slate-600 border-b text-sm"><th class="p-4 w-12 text-center">No</th><th class="p-4">Profil Stakeholder</th><th class="p-4">Layanan Direviu</th><th class="p-4">Kesimpulan / Status</th><th class="p-4 text-center">Waktu & TTD</th></thead>
+                    <tbody id="table-reviews" class="divide-y divide-slate-100"><tr><td colspan="5" class="p-8 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div></div>
                 `;
                 setTimeout(loadReviewsData, 100);
             }
             content.innerHTML = html;
         };
 
-        // ==========================================
-        // 5. GENERATE REVIU FORM KUALITATIF (KOMPONEN 2 - 14)
-        // ==========================================
+        // Initialize Signature Pad when the canvas is in the DOM
+        const initSignaturePad = () => {
+            const canvas = document.getElementById('signature-pad');
+            if(canvas) {
+                // Resize canvas properly for high DPI screens
+                const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                signaturePad = new SignaturePad(canvas, { penColor: "rgb(15, 23, 42)" });
+            }
+        };
+
+        window.clearSignature = () => { if(signaturePad) signaturePad.clear(); };
+
         window.toggleTextarea = (id, val) => {
             const ta = document.getElementById(id);
             if(val !== 'Sesuai') { ta.classList.add('show'); ta.setAttribute('required', 'true'); } 
@@ -458,6 +457,9 @@
                 `).join('') + `</div></div>`;
             });
             c.innerHTML = html + `</div>`; f.classList.remove('hidden'); b.classList.remove('hidden');
+            
+            // Inisialisasi signature pad setelah elemen muncul di DOM
+            setTimeout(initSignaturePad, 100);
         };
 
         window.submitReview = async () => {
@@ -471,68 +473,92 @@
                     if(!c) complete = false; 
                     else { 
                         const catatan = document.getElementById(`ta_${k}_${i}`).value.trim();
-                        // Jika memilih selain Sesuai, wajib isi catatan
                         if(c.value !== 'Sesuai' && catatan === '') complete = false;
                         hasilReviu[k][`komp_${i+2}`] = { nama_komponen: komp, status: c.value, catatan: catatan || '-' }; 
                     }
                 });
             });
             const kes = document.querySelector(`input[name="kesimpulan"]:checked`);
+            
             if(!complete) return showToast('Harap pilih status tiap komponen. Isi catatan jika memilih "Perlu Perubahan".', 'error');
             if(!kes) return showToast('Pilih Kesimpulan Akhir', 'error');
+            if(signaturePad && signaturePad.isEmpty()) return showToast('Mohon isi Tanda Tangan Digital Anda.', 'error');
+
+            const ttdBase64 = signaturePad ? signaturePad.toDataURL("image/png") : "";
 
             showLoader('Mengirim Dokumen Reviu...');
             try {
                 const payload = {
                     profil_penilai: stakeholderData, layanan_dipilih: sel, reviu_komponen: hasilReviu,
                     catatan_akhir: { baik: document.getElementById('essay_baik').value || '-', usulan: document.getElementById('essay_usulan').value || '-' },
-                    kesimpulan_akhir: kes.value, timestamp: IS_PREVIEW ? new Date() : serverTimestamp()
+                    kesimpulan_akhir: kes.value, ttd_digital: ttdBase64, timestamp: IS_PREVIEW ? new Date() : serverTimestamp()
                 };
 
                 if(!IS_PREVIEW) await addDoc(collection(db, "reviews"), payload);
-                else await new Promise(r => setTimeout(r, 1200)); // Simulasi delay
+                else await new Promise(r => setTimeout(r, 1200));
                 
                 document.getElementById('content-area').innerHTML = `<div class="h-full flex flex-col items-center justify-center p-6 text-center max-w-lg mx-auto"><div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mb-6"><i class="fas fa-file-signature"></i></div><h2 class="text-3xl font-bold text-slate-800 mb-3">Dokumen Reviu Terekam</h2><p class="text-slate-600 mb-8 leading-relaxed">Terima kasih <b>${stakeholderData.nama}</b>, reviu kebijakan terhadap Standar Pelayanan telah berhasil disubmit. Data Anda akan menjadi bahan evaluasi dan perbaikan formil kami.</p><button onclick="logout()" class="px-8 py-3.5 bg-white border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 shadow-sm transition-all active:scale-95">Selesai & Keluar</button></div>`;
             } catch (e) { showToast('Gagal mengirim', 'error'); } finally { hideLoader(); }
         };
 
         let currentReviewsData = [];
+        
+        // Helper function for formatting date and time
+        const formatDateTime = (timestamp) => {
+            if(!timestamp) return { date: '-', time: '-' };
+            const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const dateStr = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WITA';
+            return { date: dateStr, time: timeStr, full: `${dateStr} ${timeStr}` };
+        };
+
         const loadReviewsData = async () => {
             const tbody = document.getElementById('table-reviews');
-            if(IS_PREVIEW) { tbody.innerHTML = `<tr class="hover:bg-slate-50"><td class="p-4"><p class="font-bold text-slate-800">Budi Santoso</p><p class="text-xs text-slate-500">Direktur - PT Demo</p></td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold border border-blue-200">SP-01</span></td><td class="p-4"><span class="bg-yellow-50 text-yellow-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-yellow-200 block w-max">Disetujui dengan catatan</span></td><td class="p-4 text-center text-xs text-slate-400">Baru saja</td></tr>`; return; }
+            if(IS_PREVIEW) { tbody.innerHTML = `<tr class="hover:bg-slate-50"><td class="p-4 text-center font-bold text-slate-500">1</td><td class="p-4"><p class="font-bold text-slate-800">Budi Santoso</p><p class="text-xs text-slate-500">Direktur - PT Demo</p></td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold border border-blue-200">SP-01</span></td><td class="p-4"><span class="bg-yellow-50 text-yellow-700 px-3 py-1.5 rounded-lg text-[10px] font-bold border block w-max uppercase tracking-wide">Disetujui dengan catatan</span></td><td class="p-4 text-center"><p class="text-xs font-bold text-slate-700">27/07/2026</p><p class="text-[10px] text-slate-500">11:45 WITA</p></td></tr>`; return; }
+            
             try {
                 const snap = await getDocs(collection(db, 'reviews')); currentReviewsData = []; let html = '';
+                let no = 1;
                 snap.forEach(d => { 
                     const dt = d.data(); currentReviewsData.push(dt); 
-                    const time = dt.timestamp ? new Date(dt.timestamp.toDate()).toLocaleDateString('id-ID') : '-';
+                    const dtFormat = formatDateTime(dt.timestamp);
                     let kesBg = dt.kesimpulan_akhir.includes('tanpa') ? 'bg-green-50 text-green-700 border-green-200' : (dt.kesimpulan_akhir.includes('Perlu') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200');
-                    html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4"><p class="font-bold text-slate-800">${dt.profil_penilai.nama}</p><p class="text-xs text-slate-500">${dt.profil_penilai.jabatan} - <b>${dt.profil_penilai.instansi}</b></p></td><td class="p-4">${dt.layanan_dipilih.map(l=>`<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold border border-slate-200 mr-1 inline-block mb-1">${l}</span>`).join('')}</td><td class="p-4"><span class="${kesBg} px-3 py-1.5 rounded-lg text-[11px] font-bold border block w-max uppercase tracking-wide">${dt.kesimpulan_akhir}</span></td><td class="p-4 text-center text-xs font-medium text-slate-400">${time}</td></tr>`; 
+                    
+                    // TTD Image element if available
+                    let ttdHtml = dt.ttd_digital ? `<img src="${dt.ttd_digital}" class="h-10 mx-auto mt-1 border border-slate-200 rounded bg-white" alt="TTD">` : `<span class="text-[10px] text-slate-400 italic block mt-1">Tanpa TTD</span>`;
+
+                    html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center font-bold text-slate-500">${no++}</td><td class="p-4"><p class="font-bold text-slate-800">${dt.profil_penilai.nama}</p><p class="text-xs text-slate-500">${dt.profil_penilai.jabatan} - <b>${dt.profil_penilai.instansi}</b></p></td><td class="p-4">${dt.layanan_dipilih.map(l=>`<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold border border-slate-200 mr-1 inline-block mb-1">${l}</span>`).join('')}</td><td class="p-4"><span class="${kesBg} px-3 py-1.5 rounded-lg text-[11px] font-bold border block w-max uppercase tracking-wide">${dt.kesimpulan_akhir}</span></td><td class="p-4 text-center"><p class="text-xs font-bold text-slate-700">${dtFormat.date}</p><p class="text-[10px] text-slate-500">${dtFormat.time}</p>${ttdHtml}</td></tr>`; 
                 });
-                tbody.innerHTML = html || '<tr><td colspan="4" class="p-8 text-center text-slate-500">Belum ada data reviu.</td></tr>';
-            } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-red-500">Error memuat data</td></tr>`; }
+                tbody.innerHTML = html || '<tr><td colspan="5" class="p-8 text-center text-slate-500">Belum ada data reviu.</td></tr>';
+            } catch (e) { tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-red-500">Error memuat data</td></tr>`; }
         };
 
         window.exportToCSV = () => {
             if(IS_PREVIEW) return showToast('Fitur Export Data Aktif (Preview)', 'success');
             if(!currentReviewsData.length) return showToast('Tidak ada data untuk diekspor', 'error');
             
-            // Format CSV Detail per Item
-            let csv = "Nama Penilai,Jabatan,Instansi,Dokumen SP,No Komponen,Nama Komponen,Status Reviu,Catatan/Alasan,Kesimpulan Dokumen\n";
+            // Update CSV Header
+            let csv = "No,Tanggal Pengisian,Waktu,Nama Penilai,Jabatan,Instansi,Dokumen SP,No Komponen,Nama Komponen,Status Reviu,Catatan/Alasan,Kesimpulan Dokumen,Tanda Tangan Digital (Base64)\n";
+            
+            let no = 1;
             currentReviewsData.forEach(dt => { 
+                const dtFormat = formatDateTime(dt.timestamp);
                 const profil = `"${dt.profil_penilai.nama}","${dt.profil_penilai.jabatan}","${dt.profil_penilai.instansi}"`;
                 const kesimpulan = `"${dt.kesimpulan_akhir}"`;
+                const ttdStr = dt.ttd_digital ? `"${dt.ttd_digital.substring(0, 30)}... (Gambar Base64)"` : '"-"';
                 
                 dt.layanan_dipilih.forEach(k => {
                     const docName = `"${layananData[k].judul}"`;
                     if(dt.reviu_komponen && dt.reviu_komponen[k]) {
                         Object.keys(dt.reviu_komponen[k]).forEach(kompKey => {
                             const item = dt.reviu_komponen[k][kompKey];
-                            csv += `${profil},${docName},"${kompKey.replace('komp_','')}","${item.nama_komponen}","${item.status}","${item.catatan.replace(/"/g, '""')}",${kesimpulan}\n`;
+                            csv += `${no},"${dtFormat.date}","${dtFormat.time}",${profil},${docName},"${kompKey.replace('komp_','')}","${item.nama_komponen}","${item.status}","${item.catatan.replace(/"/g, '""')}",${kesimpulan},${ttdStr}\n`;
+                            no++;
                         });
                     }
                 });
             });
-            const link = document.createElement("a"); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = "Rekap_Reviu_Standar_Pelayanan.csv";
+            const link = document.createElement("a"); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = "Rekap_Reviu_Standar_Pelayanan_Lengkap.csv";
             document.body.appendChild(link); link.click(); link.remove();
         };
     </script>
