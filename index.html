@@ -2,42 +2,667 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Review Standar Pelayanan - Balmon Palu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Review SP Balmon Palu</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-slate-50">
-    <!-- Main App Container -->
-    <div id="app"></div>
+    
+    <!-- PWA Manifest Injection (Tanpa Blob Service Worker agar aman di Vercel/Blogger) -->
+    <script>
+        const manifestData = {
+            name: "Review SP Balmon",
+            short_name: "Review SP",
+            start_url: ".",
+            display: "standalone",
+            background_color: "#f8fafc",
+            theme_color: "#3b82f6",
+            icons: [{ src: "https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png", sizes: "192x192", type: "image/png" }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        document.write(`<link rel="manifest" href="${manifestUrl}">`);
+    </script>
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; margin: 0; min-height: 100vh; }
+        
+        /* Modern UI/UX Styles */
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
+        .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; }
+        .bento-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(59, 130, 246, 0.15); border-color: #bfdbfe; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .loader { border: 3px solid #f1f5f9; border-top: 3px solid #3b82f6; border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Custom Radio */
+        .scale-radio input:checked + label { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); }
+        .scale-radio label { transition: all 0.2s ease; }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- GLOBAL LOADER -->
+    <div id="global-loader" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+        <div class="loader w-12 h-12 border-4 mb-4"></div>
+        <p class="font-semibold text-slate-600 tracking-wide" id="loader-text">Memproses...</p>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg" id="toast-content">
+            <i class="fas fa-info-circle text-blue-500"></i> <span id="toast-msg">Notifikasi</span>
+        </div>
+    </div>
+
+    <!-- 1. HALAMAN LOGIN (OPEN ACCESS & ADMIN) -->
+    <div id="login-view" class="min-h-screen flex items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
+        <!-- Background Ornaments -->
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        
+        <div class="glass w-full max-w-md p-8 rounded-3xl relative z-10">
+            <div class="text-center mb-8 mt-2">
+                <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/30 text-white text-2xl transform rotate-3">
+                    <i class="fas fa-tower-broadcast transform -rotate-3"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Balmon Kelas II Palu</h1>
+                <p class="text-sm text-slate-500 mt-2">Platform Konsultasi & Review SP Publik</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex mb-8 bg-slate-100/80 rounded-xl p-1.5 border border-slate-200">
+                <button onclick="switchLoginTab('stakeholder')" id="tab-stakeholder" class="flex-1 py-2.5 text-sm font-semibold rounded-lg shadow-sm bg-white text-blue-600 transition-all">Stakeholder</button>
+                <button onclick="switchLoginTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all">Tim Internal</button>
+            </div>
+
+            <!-- Form Stakeholder -->
+            <div id="form-stakeholder">
+                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-6">
+                    <p class="text-xs text-blue-800 text-center leading-relaxed">Sistem Akses Terbuka. Silakan masukkan <b>Nama Instansi</b> Anda untuk memulai.</p>
+                </div>
+                <div class="mb-6">
+                    <input type="text" id="instansi-input" placeholder="Contoh: PT Telekomunikasi / ORARI" class="w-full px-5 py-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-center font-medium bg-white/50">
+                </div>
+                <button onclick="loginStakeholder()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all transform active:scale-95 flex justify-center items-center gap-2">
+                    Masuk & Review <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Admin -->
+            <div id="form-admin" class="hidden">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Email</label>
+                    <input type="email" id="admin-email" placeholder="admin@balmonpalu.go.id" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/50">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Password</label>
+                    <input type="password" id="admin-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/50">
+                </div>
+                <button onclick="loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all transform active:scale-95 flex justify-center items-center gap-2">
+                    <i class="fas fa-lock"></i> Login Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MAIN APP LAYOUT (POST-LOGIN) -->
+    <div id="main-layout" class="hidden h-screen flex flex-col md:flex-row bg-slate-50">
+        
+        <!-- SIDEBAR (Desktop) -->
+        <aside class="glass hidden md:flex flex-col w-72 h-full border-r border-slate-200 z-20">
+            <div class="p-6 border-b border-slate-200">
+                <div class="flex items-center gap-3 text-slate-800 mb-1">
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600"><i class="fas fa-tower-broadcast"></i></div>
+                    <span class="font-bold text-lg tracking-tight">Balmon Palu</span>
+                </div>
+                <div id="sidebar-role" class="mt-4"></div>
+            </div>
+            
+            <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto" id="nav-desktop">
+                <!-- Injected via JS -->
+            </nav>
+
+            <div class="p-4 border-t border-slate-200">
+                <button onclick="logout()" class="flex items-center justify-center gap-2 px-4 py-2.5 w-full text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors text-sm font-semibold">
+                    <i class="fas fa-sign-out-alt"></i> Akhiri Sesi
+                </button>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 h-full overflow-y-auto pb-24 md:pb-0 relative scroll-smooth" id="content-area">
+            <!-- Halaman dirender di sini -->
+        </main>
+
+        <!-- BOTTOM NAV (Mobile) -->
+        <nav class="glass md:hidden fixed bottom-0 left-0 w-full border-t border-slate-200 z-20 pb-safe">
+            <div class="flex justify-around items-center h-16 px-2" id="nav-mobile">
+                <!-- Injected via JS -->
+            </div>
+        </nav>
+    </div>
+
+    <!-- APP LOGIC & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        
-        // CONFIG FIREBASE ANDA (PASTIKAN MENGGANTI INI)
-      const firebaseConfig = {
-  apiKey: "AIzaSyDFxaM-yDYs_dlHfspUdbVk2akceTiGRII",
-  authDomain: "reviu-sp.firebaseapp.com",
-  projectId: "reviu-sp",
-  storageBucket: "reviu-sp.firebasestorage.app",
-  messagingSenderId: "479954097658",
-  appId: "1:479954097658:web:e542707151e3ad70e48043",
-  measurementId: "G-LCFE1827CG"
-};
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-        // DATA LAYANAN YANG SUDAH DIGABUNG
-        const layananData = {
-            'SP-01': { judul: 'Asistensi & Konsultasi Perizinan SFR', deskripsi: 'Pelayanan tatap muka/daring perizinan SFR.' },
-            'SP-02': { judul: 'UNAR & Sertifikasi Operator Radio', deskripsi: 'Ujian negara amatir radio dan sertifikasi.' },
-            'SP-03': { judul: 'Penanganan Gangguan SFR', deskripsi: 'Laporan aduan gangguan spektrum frekuensi.' }
+        // ==========================================
+        // 1. CONFIG: UBAH IS_PREVIEW JADI FALSE JIKA SUDAH SIAP LIVE
+        // ==========================================
+        const IS_PREVIEW = true; // <-- GANTI KE FALSE NANTI
+        
+        const firebaseConfig = {
+            apiKey: "API_KEY_ANDA",
+            authDomain: "PROJECT_ID.firebaseapp.com",
+            projectId: "PROJECT_ID",
+            storageBucket: "PROJECT_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
         };
 
-        // Fungsi Render UI Sederhana (Logika utama sudah kita bahas)
-        // [Fungsi navigate, render, submit, dan auth di sini]
+        let app, auth, db;
+        if (!IS_PREVIEW) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        }
+
+        // ==========================================
+        // 2. DATA LAYANAN (SUDAH DIKOREKSI & DIGABUNG)
+        // ==========================================
+        const layananData = {
+            'SP-01': {
+                judul: 'Asistensi & Konsultasi Perizinan Spektrum Frekuensi Radio',
+                deskripsi: 'Pelayanan tatap muka dan daring untuk perbantuan perizinan frekuensi radio.',
+                icon: 'fa-satellite-dish',
+                color: 'blue',
+                ringkasan: {
+                    persyaratan: ['Data diri pemohon yang masih berlaku.', 'Detail jenis layanan SFR.'],
+                    prosedur: ['Penyampaian permintaan.', 'Pencatatan oleh petugas.', 'Pemberian asistensi/konsultasi.'],
+                    waktu: 'Maksimal 1 (satu) hari kerja.',
+                    biaya: 'Tanpa Biaya (Gratis)',
+                    produk: 'Laporan penanganan konsultasi/asistensi.',
+                    kanal: 'Loket Balmon Palu, Telp: (0451) 8205191, WA: 081145500159'
+                },
+                indikator: [
+                    'Kemudahan akses kanal konsultasi (Loket/Telepon/WA).',
+                    'Kejelasan informasi persyaratan perizinan SFR.',
+                    'Kejelasan penjelasan mekanisme dan prosedur oleh petugas.',
+                    'Kompetensi dan keramahan petugas pelayanan.',
+                    'Kecepatan respons petugas (SLA 1 hari kerja).'
+                ]
+            },
+            'SP-02': {
+                judul: 'Penyelenggaraan UNAR & Sertifikasi Operator Radio',
+                deskripsi: 'Pelaksanaan ujian negara amatir radio (UNAR) dan sertifikasi operator.',
+                icon: 'fa-broadcast-tower',
+                color: 'purple',
+                ringkasan: {
+                    persyaratan: ['Akun e-Licensing.', 'KTP & Pas foto.', 'Surat Rekomendasi Organisasi.'],
+                    prosedur: ['Daftar via e-Licensing.', 'Verifikasi Panitia.', 'Ujian CAT.', 'Pengumuman.'],
+                    waktu: '1 (satu) hari kerja.',
+                    biaya: 'Sesuai Tarif PNBP (PP 43/2023).',
+                    produk: 'Hasil Kelulusan UNAR / Sertifikat Operator.',
+                    kanal: 'e-Licensing, Aplikasi CAT.'
+                },
+                indikator: [
+                    'Kemudahan pendaftaran dan registrasi online (e-Licensing).',
+                    'Kejelasan informasi jadwal dan persyaratan.',
+                    'Kelancaran pelaksanaan ujian sistem Computer Assisted Test (CAT).',
+                    'Profesionalisme panitia penyelenggara ujian.',
+                    'Kecepatan dan transparansi pengumuman hasil kelulusan.'
+                ]
+            },
+            'SP-03': {
+                judul: 'Penanganan Gangguan Penggunaan Spektrum Frekuensi',
+                deskripsi: 'Pelayanan penanganan aduan gangguan frekuensi radio berskala prioritas.',
+                icon: 'fa-exclamation-triangle',
+                color: 'rose',
+                ringkasan: {
+                    persyaratan: ['Laporan detail (Nama, lokasi, frekuensi).', 'Salinan ISR.', 'Bukti dukung (foto/video).'],
+                    prosedur: ['Laporan masuk.', 'Klarifikasi.', 'Analisa & Inspeksi.', 'Pelacakan.', 'Tindakan penanganan.'],
+                    waktu: 'Sesuai klasifikasi gangguan (Perdirjen 6/2020).',
+                    biaya: 'Tanpa Biaya (Gratis)',
+                    produk: 'Berita Acara Penanganan Gangguan.',
+                    kanal: 'laporgangguansfr.postel.go.id, Call Center 159 ext 2.'
+                },
+                indikator: [
+                    'Kemudahan penyampaian laporan gangguan melalui kanal resmi.',
+                    'Kejelasan persyaratan bukti dukung gangguan.',
+                    'Kecepatan respons petugas terhadap laporan gangguan.',
+                    'Transparansi proses pelacakan dan penanganan.',
+                    'Kejelasan informasi hasil akhir penanganan gangguan.'
+                ]
+            }
+        };
+
+        // ==========================================
+        // 3. UI UTILITIES & STATE
+        // ==========================================
+        let currentUserRole = null;
+        let stakeholderName = '';
+
+        window.showLoader = (msg='Memproses') => { 
+            document.getElementById('loader-text').innerText=msg; 
+            document.getElementById('global-loader').classList.remove('hidden'); 
+        }
+        window.hideLoader = () => { document.getElementById('global-loader').classList.add('hidden'); }
+        
+        window.showToast = (msg, type='info') => {
+            const t = document.getElementById('toast');
+            const c = document.getElementById('toast-content');
+            document.getElementById('toast-msg').innerText = msg;
+            
+            if(type==='error') c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-red-500 text-red-600 bg-red-50/90';
+            else if(type==='success') c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-green-500 text-green-700 bg-green-50/90';
+            else c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-blue-500 text-blue-700 bg-blue-50/90';
+            
+            t.classList.remove('opacity-0', '-translate-y-5');
+            setTimeout(() => t.classList.add('opacity-0', '-translate-y-5'), 3500);
+        }
+
+        window.switchLoginTab = (t) => {
+            document.getElementById('form-stakeholder').classList.toggle('hidden', t!=='stakeholder');
+            document.getElementById('form-admin').classList.toggle('hidden', t!=='admin');
+            document.getElementById('tab-stakeholder').className = t==='stakeholder' ? 'flex-1 py-2.5 text-sm font-semibold rounded-lg shadow-sm bg-white text-blue-600' : 'flex-1 py-2.5 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700';
+            document.getElementById('tab-admin').className = t==='admin' ? 'flex-1 py-2.5 text-sm font-semibold rounded-lg shadow-sm bg-white text-indigo-600' : 'flex-1 py-2.5 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700';
+        }
+
+        // ==========================================
+        // 4. AUTHENTICATION
+        // ==========================================
+        window.loginStakeholder = () => {
+            const val = document.getElementById('instansi-input').value.trim();
+            if(!val) return showToast('Mohon isi Nama Instansi Anda.', 'error');
+            
+            stakeholderName = val;
+            currentUserRole = 'stakeholder';
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('main-layout').classList.remove('hidden');
+            setupNavigation();
+            navigate('beranda-stakeholder');
+            showToast(`Selamat datang, ${stakeholderName}`, 'success');
+        }
+
+        window.loginAdmin = async () => {
+            const e = document.getElementById('admin-email').value;
+            const p = document.getElementById('admin-password').value;
+            if(!e || !p) return showToast('Isi Email & Password', 'error');
+            
+            showLoader('Login...');
+            try {
+                if(IS_PREVIEW) { 
+                    if(e!=='admin@test.com' || p!=='123456') throw new Error('Preview: Coba admin@test.com / 123456'); 
+                } else {
+                    await signInWithEmailAndPassword(auth, e, p);
+                }
+                currentUserRole = 'admin';
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('main-layout').classList.remove('hidden');
+                setupNavigation();
+                navigate('hasil-review');
+            } catch (err) { showToast(err.message, 'error'); }
+            finally { hideLoader(); }
+        }
+
+        window.logout = () => {
+            if(!IS_PREVIEW && currentUserRole==='admin') signOut(auth);
+            currentUserRole = null; 
+            document.getElementById('main-layout').classList.add('hidden'); 
+            document.getElementById('login-view').classList.remove('hidden');
+        }
+
+        const menuConfig = {
+            stakeholder: [
+                { id: 'beranda-stakeholder', icon: 'fa-table-cells-large', label: 'Dashboard Layanan' },
+                { id: 'form-review', icon: 'fa-clipboard-check', label: 'Isi Kuesioner' }
+            ],
+            admin: [
+                { id: 'hasil-review', icon: 'fa-chart-pie', label: 'Matriks & Ekspor' }
+            ]
+        };
+
+        const setupNavigation = () => {
+            const roleEl = document.getElementById('sidebar-role');
+            roleEl.innerHTML = currentUserRole === 'admin' ? 
+                '<span class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-200"><i class="fas fa-shield-alt mr-1"></i> Admin Internal</span>' : 
+                `<span class="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 block truncate" title="${stakeholderName}"><i class="fas fa-building mr-1"></i> ${stakeholderName}</span>`;
+
+            const menus = menuConfig[currentUserRole];
+            
+            document.getElementById('nav-desktop').innerHTML = menus.map(m => `
+                <button onclick="navigate('${m.id}')" id="navD-${m.id}" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left font-medium text-slate-500 hover:bg-slate-100/50 hover:text-blue-600 transition-all border border-transparent">
+                    <i class="fas ${m.icon} w-5 text-center text-lg"></i> ${m.label}
+                </button>
+            `).join('');
+
+            let mobileMenus = [...menus];
+            if(currentUserRole === 'admin') mobileMenus.push({id:'logout', icon:'fa-power-off', label:'Keluar'});
+            
+            document.getElementById('nav-mobile').innerHTML = mobileMenus.map(m => {
+                if(m.id === 'logout') return `<button onclick="logout()" class="flex flex-col items-center w-16 text-red-500"><i class="fas ${m.icon} text-xl mb-1"></i><span class="text-[10px] font-bold">Keluar</span></button>`;
+                return `
+                <button onclick="navigate('${m.id}')" id="navM-${m.id}" class="flex flex-col items-center w-20 py-1 text-slate-400 hover:text-blue-600 transition-colors">
+                    <i class="fas ${m.icon} text-xl mb-1 transition-transform"></i>
+                    <span class="text-[10px] font-bold text-center leading-tight">${m.label}</span>
+                </button>
+            `}).join('');
+        };
+
+        window.navigate = (pageId) => {
+            menuConfig[currentUserRole].forEach(m => {
+                const d = document.getElementById(`navD-${m.id}`), mb = document.getElementById(`navM-${m.id}`);
+                if(d) { d.classList.toggle('bg-white', m.id===pageId); d.classList.toggle('text-blue-600', m.id===pageId); d.classList.toggle('shadow-sm', m.id===pageId); d.classList.toggle('border-slate-200', m.id===pageId); d.classList.toggle('text-slate-500', m.id!==pageId); }
+                if(mb) { mb.classList.toggle('text-blue-600', m.id===pageId); mb.classList.toggle('text-slate-400', m.id!==pageId); }
+            });
+            renderPageContent(pageId);
+        };
+
+        // ==========================================
+        // 5. PAGE RENDERER (UI/UX)
+        // ==========================================
+        const renderPageContent = (pageId) => {
+            const content = document.getElementById('content-area');
+            let html = '';
+
+            if (pageId === 'beranda-stakeholder') {
+                html = `
+                    <div class="p-6 md:p-10 max-w-6xl mx-auto">
+                        <header class="mb-10">
+                            <span class="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block tracking-widest uppercase">Executive Summary</span>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Standar Pelayanan Balmon</h2>
+                            <p class="text-slate-500 text-lg max-w-2xl">Silakan cermati spesifikasi dari ketiga layanan di bawah ini sebelum Anda memberikan penilaian di halaman kuesioner.</p>
+                        </header>
+
+                        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-10">
+                            ${Object.keys(layananData).map(k => `
+                                <div class="glass-card bento-hover p-6 rounded-[24px] border-t-4 border-${layananData[k].color}-500 flex flex-col h-full bg-white relative overflow-hidden group">
+                                    <div class="w-14 h-14 bg-${layananData[k].color}-100 rounded-2xl flex items-center justify-center mb-5 text-${layananData[k].color}-600 text-2xl group-hover:scale-110 transition-transform">
+                                        <i class="fas ${layananData[k].icon}"></i>
+                                    </div>
+                                    <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">${layananData[k].judul}</h3>
+                                    <p class="text-sm text-slate-500 mb-6 flex-1">${layananData[k].deskripsi}</p>
+                                    
+                                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-3">
+                                        <div class="flex items-start gap-3">
+                                            <i class="fas fa-clock text-slate-400 mt-1 text-sm"></i>
+                                            <div>
+                                                <p class="text-[10px] uppercase font-bold text-slate-400">Jangka Waktu</p>
+                                                <p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.waktu}</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-3">
+                                            <i class="fas fa-money-bill-wave text-slate-400 mt-1 text-sm"></i>
+                                            <div>
+                                                <p class="text-[10px] uppercase font-bold text-slate-400">Biaya / Tarif</p>
+                                                <p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.biaya}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="glass p-8 rounded-3xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Sudah membaca ringkasan layanan?</h4>
+                                <p class="text-slate-600 text-sm mt-1">Lanjutkan ke formulir untuk memberikan masukan Anda.</p>
+                            </div>
+                            <button onclick="navigate('form-review')" class="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl font-semibold transition-all shadow-lg shadow-slate-900/20 active:scale-95 whitespace-nowrap">
+                                Mulai Kuesioner <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } 
+            else if (pageId === 'form-review') {
+                html = `
+                    <div class="p-6 md:p-10 max-w-4xl mx-auto pb-28">
+                        <header class="mb-8">
+                            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Formulir Kuesioner</h2>
+                            <p class="text-slate-500 text-lg">Berikan penilaian jujur Anda untuk penyempurnaan layanan.</p>
+                        </header>
+                        
+                        <!-- Step 1 -->
+                        <div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]">
+                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">1</div>
+                                <div>
+                                    <h3 class="font-bold text-xl text-slate-800">Layanan yang Digunakan</h3>
+                                    <p class="text-sm text-slate-500">Pilih satu atau lebih layanan yang pernah Anda gunakan:</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 pl-14">
+                                ${Object.keys(layananData).map(k => `
+                                    <label class="flex items-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors group">
+                                        <input type="checkbox" class="cb-layanan w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-slate-300" value="${k}" onchange="generateQuestions()">
+                                        <span class="ml-4 font-medium text-slate-700 group-hover:text-blue-700">${layananData[k].judul}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Step 2 Container -->
+                        <div id="q-container"></div>
+
+                        <!-- Step 3 Container -->
+                        <div id="final-container" class="hidden glass-card p-6 md:p-8 mb-8 rounded-[24px]">
+                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">3</div>
+                                <div>
+                                    <h3 class="font-bold text-xl text-slate-800">Masukan & Kesimpulan</h3>
+                                    <p class="text-sm text-slate-500">Berikan pendapat kualitatif Anda.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-6 pl-14 mb-8">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Bagian apa yang sudah baik dan perlu dipertahankan?</label>
+                                    <textarea id="essay_baik" rows="2" class="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Usulan penyempurnaan standar pelayanan?</label>
+                                    <textarea id="essay_usulan" rows="3" class="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 pl-14 ml-14">
+                                <label class="block text-base font-bold text-blue-900 mb-4">Kesimpulan Akhir terhadap Standar Pelayanan:</label>
+                                <div class="grid gap-3">
+                                    ${['Setuju tanpa perbaikan', 'Setuju dengan perbaikan minor', 'Perlu dilakukan perbaikan'].map(v => `
+                                        <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-100/50 rounded-lg transition-colors">
+                                            <input type="radio" name="kesimpulan" value="${v}" class="w-4 h-4 text-blue-600"> 
+                                            <span class="font-medium text-blue-900">${v}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="btn-submit" onclick="submitReview()" class="hidden w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform active:scale-95 text-lg flex justify-center items-center gap-2">
+                            <i class="fas fa-paper-plane"></i> Kirim Form Review
+                        </button>
+                    </div>
+                `;
+            }
+            // ADMIN VIEW
+            else if (pageId === 'hasil-review') {
+                html = `
+                    <div class="p-6 md:p-10 h-full flex flex-col max-w-7xl mx-auto">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                            <div>
+                                <h2 class="text-3xl font-extrabold text-slate-900">Matriks Hasil Review</h2>
+                                <p class="text-slate-500 mt-1">Pantau, analisis, dan ekspor data masukan stakeholder.</p>
+                            </div>
+                            <button onclick="window.exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-green-600/20 flex items-center gap-2 transition-all">
+                                <i class="fas fa-file-csv"></i> Ekspor Data CSV
+                            </button>
+                        </div>
+                        <div class="glass-card flex-1 overflow-hidden flex flex-col shadow-sm rounded-2xl border-t-4 border-indigo-500">
+                            <div class="overflow-x-auto flex-1">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50 text-slate-600 text-sm border-b border-slate-200">
+                                            <th class="p-4 font-bold min-w-[200px]">Instansi</th>
+                                            <th class="p-4 font-bold min-w-[200px]">Layanan Direview</th>
+                                            <th class="p-4 font-bold min-w-[300px]">Usulan Utama</th>
+                                            <th class="p-4 font-bold">Kesimpulan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-reviews" class="text-sm divide-y divide-slate-100 bg-white">
+                                        <tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i> Memuat data...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                setTimeout(loadReviewsData, 100);
+            }
+            content.innerHTML = html;
+        };
+
+        // ==========================================
+        // 6. FORM LOGIC & DATABASE
+        // ==========================================
+        window.generateQuestions = () => {
+            const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
+            const c = document.getElementById('q-container');
+            const f = document.getElementById('final-container');
+            const b = document.getElementById('btn-submit');
+
+            if(!sel.length) { c.innerHTML=''; f.classList.add('hidden'); b.classList.add('hidden'); return; }
+
+            let html = `
+                <div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]">
+                    <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">2</div>
+                        <div>
+                            <h3 class="font-bold text-xl text-slate-800">Penilaian Skala Kuantitatif</h3>
+                            <p class="text-sm text-slate-500">Skala: 1 (Tidak Baik) - 4 (Sangat Baik)</p>
+                        </div>
+                    </div>
+            `;
+
+            sel.forEach(k => {
+                const l = layananData[k];
+                html += `
+                    <div class="ml-14 mb-8 p-6 border border-slate-200 rounded-2xl bg-slate-50/50">
+                        <h4 class="font-bold text-${l.color}-700 mb-5 flex items-center gap-2"><i class="fas ${l.icon}"></i> ${l.judul}</h4>
+                        <div class="space-y-6">
+                            ${l.indikator.map((ind, idx) => `
+                                <div>
+                                    <p class="text-sm font-medium text-slate-700 mb-3">${idx+1}. ${ind}</p>
+                                    <div class="flex gap-2 scale-radio max-w-md">
+                                        ${[1,2,3,4].map(v => `
+                                            <div class="flex-1">
+                                                <input type="radio" id="s_${k}_${idx}_${v}" name="s_${k}_${idx}" value="${v}" class="hidden" required>
+                                                <label for="s_${k}_${idx}_${v}" class="block text-center py-2.5 border border-slate-300 bg-white rounded-lg cursor-pointer hover:bg-slate-50 text-sm font-bold text-slate-500 shadow-sm">${v}</label>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            c.innerHTML = html + `</div>`;
+            f.classList.remove('hidden'); b.classList.remove('hidden');
+        };
+
+        window.submitReview = async () => {
+            const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
+            let complete = true; const skala = {};
+            
+            sel.forEach(k => {
+                layananData[k].indikator.forEach((_, i) => {
+                    const c = document.querySelector(`input[name="s_${k}_${i}"]:checked`);
+                    if(!c) complete = false;
+                    else { if(!skala[k]) skala[k]={}; skala[k][`ind_${i}`] = parseInt(c.value); }
+                });
+            });
+
+            const kes = document.querySelector(`input[name="kesimpulan"]:checked`);
+            if(!complete) return showToast('Lengkapi semua skala (1-4)', 'error');
+            if(!kes) return showToast('Pilih Kesimpulan Akhir', 'error');
+
+            const payload = {
+                nama_instansi: stakeholderName,
+                layanan_dipilih: sel,
+                penilaian_skala: skala,
+                jawaban_terbuka: { 
+                    baik: document.getElementById('essay_baik').value || '-', 
+                    usulan: document.getElementById('essay_usulan').value || '-' 
+                },
+                kesimpulan_akhir: kes.value,
+                timestamp: IS_PREVIEW ? new Date() : serverTimestamp()
+            };
+
+            showLoader('Mengirim...');
+            try {
+                if(!IS_PREVIEW) await addDoc(collection(db, "reviews"), payload);
+                else await new Promise(r => setTimeout(r, 1000));
+                
+                document.getElementById('content-area').innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center p-6 text-center max-w-lg mx-auto">
+                        <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mb-6"><i class="fas fa-check"></i></div>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-3">Terima Kasih!</h2>
+                        <p class="text-slate-600 mb-8">Masukan Anda telah terekam dan akan menjadi bahan evaluasi kami.</p>
+                        <button onclick="logout()" class="px-8 py-3 bg-white border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 shadow-sm">Kembali ke Awal</button>
+                    </div>`;
+            } catch (e) { showToast('Gagal mengirim', 'error'); }
+            finally { hideLoader(); }
+        };
+
+        // ADMIN FETCHER & EXPORT
+        let currentReviewsData = [];
+        const loadReviewsData = async () => {
+            const tbody = document.getElementById('table-reviews');
+            if(IS_PREVIEW) {
+                tbody.innerHTML = `<tr><td class="p-4 font-bold">PT Demo Telekomunikasi</td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">SP-01</span></td><td class="p-4 text-sm">"Percepat layanan"</td><td class="p-4"><span class="bg-slate-100 px-2 py-1 rounded text-xs">Setuju</span></td></tr>`;
+                return;
+            }
+            try {
+                const snap = await getDocs(collection(db, 'reviews'));
+                currentReviewsData = []; let html = '';
+                snap.forEach(d => {
+                    const dt = d.data(); currentReviewsData.push(dt);
+                    html += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">${dt.nama_instansi}</td>
+                        <td class="p-4">${dt.layanan_dipilih.map(l=>`<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs mr-1 border border-slate-200 inline-block mb-1">${l}</span>`).join('')}</td>
+                        <td class="p-4 text-sm text-slate-600 italic">"${dt.jawaban_terbuka.usulan}"</td>
+                        <td class="p-4"><span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg">${dt.kesimpulan_akhir}</span></td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html || '<tr><td colspan="4" class="p-8 text-center text-slate-500">Belum ada data masuk.</td></tr>';
+            } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-red-500">Error memuat data</td></tr>`; }
+        };
+
+        window.exportToCSV = () => {
+            if(IS_PREVIEW) return showToast('Preview: Fitur Export Aktif', 'success');
+            if(!currentReviewsData.length) return showToast('Data kosong', 'error');
+            let csv = "Instansi,Layanan,Usulan,Kesimpulan\n";
+            currentReviewsData.forEach(i => { csv += `"${i.nama_instansi}","${i.layanan_dipilih.join(', ')}","${i.jawaban_terbuka.usulan}","${i.kesimpulan_akhir}"\n`; });
+            const link = document.createElement("a");
+            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+            link.download = "Hasil_Review_Balmon.csv";
+            document.body.appendChild(link); link.click(); link.remove();
+        };
     </script>
 </body>
 </html>
+```eof
