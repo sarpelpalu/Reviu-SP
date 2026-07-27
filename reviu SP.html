@@ -1,1 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Standar Pelayanan - Balmon Palu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50">
+    <!-- Main App Container -->
+    <div id="app"></div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
+        // CONFIG FIREBASE ANDA (PASTIKAN MENGGANTI INI)
+      const firebaseConfig = {
+  apiKey: "AIzaSyDFxaM-yDYs_dlHfspUdbVk2akceTiGRII",
+  authDomain: "reviu-sp.firebaseapp.com",
+  projectId: "reviu-sp",
+  storageBucket: "reviu-sp.firebasestorage.app",
+  messagingSenderId: "479954097658",
+  appId: "1:479954097658:web:e542707151e3ad70e48043",
+  measurementId: "G-LCFE1827CG"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+        // DATA LAYANAN YANG SUDAH DIGABUNG
+        const layananData = {
+            'SP-01': { judul: 'Asistensi & Konsultasi Perizinan SFR', deskripsi: 'Pelayanan tatap muka/daring perizinan SFR.' },
+            'SP-02': { judul: 'UNAR & Sertifikasi Operator Radio', deskripsi: 'Ujian negara amatir radio dan sertifikasi.' },
+            'SP-03': { judul: 'Penanganan Gangguan SFR', deskripsi: 'Laporan aduan gangguan spektrum frekuensi.' }
+        };
+
+        // Fungsi Render UI Sederhana (Logika utama sudah kita bahas)
+        // [Fungsi navigate, render, submit, dan auth di sini]
+    </script>
+</body>
+</html>
