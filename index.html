@@ -152,101 +152,72 @@
     </div>
 
     <!-- APP LOGIC & FIREBASE -->
+   <!-- APP LOGIC & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
-        // 1. CONFIG: UBAH IS_PREVIEW JADI FALSE JIKA SUDAH SIAP LIVE
+        // 1. CONFIG
         // ==========================================
-        const IS_PREVIEW = true; // <-- GANTI KE FALSE NANTI
+        let IS_PREVIEW = true; // BISA DIUBAH JADI false NANTI
         
-     const firebaseConfig = {
-  apiKey: "AIzaSyDFxaM-yDYs_dlHfspUdbVk2akceTiGRII",
-  authDomain: "reviu-sp.firebaseapp.com",
-  projectId: "reviu-sp",
-  storageBucket: "reviu-sp.firebasestorage.app",
-  messagingSenderId: "479954097658",
-  appId: "1:479954097658:web:e542707151e3ad70e48043",
-  measurementId: "G-LCFE1827CG"
-};
+        const firebaseConfig = {
+            apiKey: "API_KEY_ANDA",
+            authDomain: "PROJECT_ID.firebaseapp.com",
+            projectId: "PROJECT_ID",
+            storageBucket: "PROJECT_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+        let app, auth, db;
+        // Pelindung Error Firebase
+        try {
+            if (!IS_PREVIEW) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+            }
+        } catch (error) {
+            console.error("Firebase Error:", error);
+            alert("Sistem Firebase gagal terhubung. Dialihkan otomatis ke Mode Preview.");
+            IS_PREVIEW = true;
+        }
 
         // ==========================================
-        // 2. DATA LAYANAN (SUDAH DIKOREKSI & DIGABUNG)
+        // 2. DATA LAYANAN
         // ==========================================
         const layananData = {
             'SP-01': {
-                judul: 'Asistensi & Konsultasi Perizinan Spektrum Frekuensi Radio',
-                deskripsi: 'Pelayanan tatap muka dan daring untuk perbantuan perizinan frekuensi radio.',
+                judul: 'Asistensi & Konsultasi Perizinan SFR',
+                deskripsi: 'Pelayanan tatap muka dan daring untuk perbantuan perizinan.',
                 icon: 'fa-satellite-dish',
-                color: 'blue',
-                ringkasan: {
-                    persyaratan: ['Data diri pemohon yang masih berlaku.', 'Detail jenis layanan SFR.'],
-                    prosedur: ['Penyampaian permintaan.', 'Pencatatan oleh petugas.', 'Pemberian asistensi/konsultasi.'],
-                    waktu: 'Maksimal 1 (satu) hari kerja.',
-                    biaya: 'Tanpa Biaya (Gratis)',
-                    produk: 'Laporan penanganan konsultasi/asistensi.',
-                    kanal: 'Loket Balmon Palu, Telp: (0451) 8205191, WA: 081145500159'
-                },
-                indikator: [
-                    'Kemudahan akses kanal konsultasi (Loket/Telepon/WA).',
-                    'Kejelasan informasi persyaratan perizinan SFR.',
-                    'Kejelasan penjelasan mekanisme dan prosedur oleh petugas.',
-                    'Kompetensi dan keramahan petugas pelayanan.',
-                    'Kecepatan respons petugas (SLA 1 hari kerja).'
-                ]
+                tema: { border: 'border-blue-500', bg: 'bg-blue-100', text: 'text-blue-600' },
+                ringkasan: { persyaratan: ['Data diri.', 'Detail jenis layanan SFR.'], prosedur: ['Penyampaian.', 'Pencatatan.', 'Asistensi.'], waktu: 'Maksimal 1 hari.', biaya: 'Gratis', produk: 'Laporan asistensi.', kanal: 'Loket, Telp, WA' },
+                indikator: ['Kemudahan akses kanal (Loket/Telepon/WA).', 'Kejelasan informasi persyaratan.', 'Penjelasan mekanisme oleh petugas.', 'Kompetensi dan keramahan petugas.', 'Kecepatan respons (1 hari).']
             },
             'SP-02': {
-                judul: 'Penyelenggaraan UNAR & Sertifikasi Operator Radio',
-                deskripsi: 'Pelaksanaan ujian negara amatir radio (UNAR) dan sertifikasi operator.',
+                judul: 'UNAR & Sertifikasi Operator Radio',
+                deskripsi: 'Pelaksanaan ujian negara amatir radio dan sertifikasi.',
                 icon: 'fa-broadcast-tower',
-                color: 'purple',
-                ringkasan: {
-                    persyaratan: ['Akun e-Licensing.', 'KTP & Pas foto.', 'Surat Rekomendasi Organisasi.'],
-                    prosedur: ['Daftar via e-Licensing.', 'Verifikasi Panitia.', 'Ujian CAT.', 'Pengumuman.'],
-                    waktu: '1 (satu) hari kerja.',
-                    biaya: 'Sesuai Tarif PNBP (PP 43/2023).',
-                    produk: 'Hasil Kelulusan UNAR / Sertifikat Operator.',
-                    kanal: 'e-Licensing, Aplikasi CAT.'
-                },
-                indikator: [
-                    'Kemudahan pendaftaran dan registrasi online (e-Licensing).',
-                    'Kejelasan informasi jadwal dan persyaratan.',
-                    'Kelancaran pelaksanaan ujian sistem Computer Assisted Test (CAT).',
-                    'Profesionalisme panitia penyelenggara ujian.',
-                    'Kecepatan dan transparansi pengumuman hasil kelulusan.'
-                ]
+                tema: { border: 'border-purple-500', bg: 'bg-purple-100', text: 'text-purple-600' },
+                ringkasan: { persyaratan: ['Akun e-Licensing.', 'KTP & Foto.', 'Rekomendasi.'], prosedur: ['Daftar online.', 'Verifikasi.', 'Ujian CAT.', 'Pengumuman.'], waktu: '1 hari kerja.', biaya: 'Sesuai Tarif PNBP.', produk: 'Hasil Kelulusan.', kanal: 'e-Licensing, Aplikasi CAT.' },
+                indikator: ['Kemudahan registrasi online.', 'Kejelasan jadwal dan syarat.', 'Kelancaran ujian sistem CAT.', 'Profesionalisme panitia.', 'Kecepatan pengumuman kelulusan.']
             },
             'SP-03': {
-                judul: 'Penanganan Gangguan Penggunaan Spektrum Frekuensi',
-                deskripsi: 'Pelayanan penanganan aduan gangguan frekuensi radio berskala prioritas.',
+                judul: 'Penanganan Gangguan SFR',
+                deskripsi: 'Penanganan aduan gangguan frekuensi radio berskala prioritas.',
                 icon: 'fa-exclamation-triangle',
-                color: 'rose',
-                ringkasan: {
-                    persyaratan: ['Laporan detail (Nama, lokasi, frekuensi).', 'Salinan ISR.', 'Bukti dukung (foto/video).'],
-                    prosedur: ['Laporan masuk.', 'Klarifikasi.', 'Analisa & Inspeksi.', 'Pelacakan.', 'Tindakan penanganan.'],
-                    waktu: 'Sesuai klasifikasi gangguan (Perdirjen 6/2020).',
-                    biaya: 'Tanpa Biaya (Gratis)',
-                    produk: 'Berita Acara Penanganan Gangguan.',
-                    kanal: 'laporgangguansfr.postel.go.id, Call Center 159 ext 2.'
-                },
-                indikator: [
-                    'Kemudahan penyampaian laporan gangguan melalui kanal resmi.',
-                    'Kejelasan persyaratan bukti dukung gangguan.',
-                    'Kecepatan respons petugas terhadap laporan gangguan.',
-                    'Transparansi proses pelacakan dan penanganan.',
-                    'Kejelasan informasi hasil akhir penanganan gangguan.'
-                ]
+                tema: { border: 'border-rose-500', bg: 'bg-rose-100', text: 'text-rose-600' },
+                ringkasan: { persyaratan: ['Laporan detail.', 'Salinan ISR.', 'Bukti dukung.'], prosedur: ['Laporan.', 'Klarifikasi.', 'Analisa.', 'Pelacakan.', 'Tindakan.'], waktu: 'Sesuai klasifikasi.', biaya: 'Gratis', produk: 'Berita Acara.', kanal: 'Web Lapor, Call Center 159.' },
+                indikator: ['Kemudahan lapor melalui kanal resmi.', 'Kejelasan persyaratan bukti dukung.', 'Kecepatan respons petugas awal.', 'Transparansi proses pelacakan.', 'Kejelasan informasi hasil akhir.']
             }
         };
 
         // ==========================================
-        // 3. UI UTILITIES & STATE
+        // 3. UI UTILITIES
         // ==========================================
         let currentUserRole = null;
         let stakeholderName = '';
@@ -321,6 +292,9 @@ const analytics = getAnalytics(app);
             document.getElementById('login-view').classList.remove('hidden');
         }
 
+        // ==========================================
+        // 5. NAVIGATION
+        // ==========================================
         const menuConfig = {
             stakeholder: [
                 { id: 'beranda-stakeholder', icon: 'fa-table-cells-large', label: 'Dashboard Layanan' },
@@ -368,7 +342,7 @@ const analytics = getAnalytics(app);
         };
 
         // ==========================================
-        // 5. PAGE RENDERER (UI/UX)
+        // 6. PAGE RENDERER (UI/UX)
         // ==========================================
         const renderPageContent = (pageId) => {
             const content = document.getElementById('content-area');
@@ -385,8 +359,8 @@ const analytics = getAnalytics(app);
 
                         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-10">
                             ${Object.keys(layananData).map(k => `
-                                <div class="glass-card bento-hover p-6 rounded-[24px] border-t-4 border-${layananData[k].color}-500 flex flex-col h-full bg-white relative overflow-hidden group">
-                                    <div class="w-14 h-14 bg-${layananData[k].color}-100 rounded-2xl flex items-center justify-center mb-5 text-${layananData[k].color}-600 text-2xl group-hover:scale-110 transition-transform">
+                                <div class="glass-card bento-hover p-6 rounded-[24px] ${layananData[k].tema.border} border-t-4 flex flex-col h-full bg-white relative overflow-hidden group">
+                                    <div class="w-14 h-14 ${layananData[k].tema.bg} rounded-2xl flex items-center justify-center mb-5 ${layananData[k].tema.text} text-2xl group-hover:scale-110 transition-transform">
                                         <i class="fas ${layananData[k].icon}"></i>
                                     </div>
                                     <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">${layananData[k].judul}</h3>
@@ -396,15 +370,8 @@ const analytics = getAnalytics(app);
                                         <div class="flex items-start gap-3">
                                             <i class="fas fa-clock text-slate-400 mt-1 text-sm"></i>
                                             <div>
-                                                <p class="text-[10px] uppercase font-bold text-slate-400">Jangka Waktu</p>
+                                                <p class="text-[10px] uppercase font-bold text-slate-400">Waktu Pelayanan</p>
                                                 <p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.waktu}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start gap-3">
-                                            <i class="fas fa-money-bill-wave text-slate-400 mt-1 text-sm"></i>
-                                            <div>
-                                                <p class="text-[10px] uppercase font-bold text-slate-400">Biaya / Tarif</p>
-                                                <p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.biaya}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -429,103 +396,51 @@ const analytics = getAnalytics(app);
                     <div class="p-6 md:p-10 max-w-4xl mx-auto pb-28">
                         <header class="mb-8">
                             <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Formulir Kuesioner</h2>
-                            <p class="text-slate-500 text-lg">Berikan penilaian jujur Anda untuk penyempurnaan layanan.</p>
                         </header>
                         
-                        <!-- Step 1 -->
                         <div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]">
                             <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
                                 <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">1</div>
-                                <div>
-                                    <h3 class="font-bold text-xl text-slate-800">Layanan yang Digunakan</h3>
-                                    <p class="text-sm text-slate-500">Pilih satu atau lebih layanan yang pernah Anda gunakan:</p>
-                                </div>
+                                <div><h3 class="font-bold text-xl text-slate-800">Layanan yang Digunakan</h3></div>
                             </div>
-                            
                             <div class="space-y-3 pl-14">
                                 ${Object.keys(layananData).map(k => `
-                                    <label class="flex items-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors group">
-                                        <input type="checkbox" class="cb-layanan w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-slate-300" value="${k}" onchange="generateQuestions()">
-                                        <span class="ml-4 font-medium text-slate-700 group-hover:text-blue-700">${layananData[k].judul}</span>
+                                    <label class="flex items-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                                        <input type="checkbox" class="cb-layanan w-5 h-5 text-blue-600" value="${k}" onchange="generateQuestions()">
+                                        <span class="ml-4 font-medium text-slate-700">${layananData[k].judul}</span>
                                     </label>
                                 `).join('')}
                             </div>
                         </div>
 
-                        <!-- Step 2 Container -->
                         <div id="q-container"></div>
 
-                        <!-- Step 3 Container -->
                         <div id="final-container" class="hidden glass-card p-6 md:p-8 mb-8 rounded-[24px]">
                             <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
                                 <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">3</div>
-                                <div>
-                                    <h3 class="font-bold text-xl text-slate-800">Masukan & Kesimpulan</h3>
-                                    <p class="text-sm text-slate-500">Berikan pendapat kualitatif Anda.</p>
-                                </div>
+                                <div><h3 class="font-bold text-xl text-slate-800">Kesimpulan Akhir</h3></div>
                             </div>
-                            
                             <div class="space-y-6 pl-14 mb-8">
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Bagian apa yang sudah baik dan perlu dipertahankan?</label>
-                                    <textarea id="essay_baik" rows="2" class="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Usulan penyempurnaan standar pelayanan?</label>
-                                    <textarea id="essay_usulan" rows="3" class="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"></textarea>
-                                </div>
+                                <div><label class="block text-sm font-semibold mb-2">Apa yang sudah baik?</label><textarea id="essay_baik" rows="2" class="w-full p-4 border rounded-xl"></textarea></div>
+                                <div><label class="block text-sm font-semibold mb-2">Usulan penyempurnaan?</label><textarea id="essay_usulan" rows="3" class="w-full p-4 border rounded-xl"></textarea></div>
                             </div>
-
-                            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 pl-14 ml-14">
-                                <label class="block text-base font-bold text-blue-900 mb-4">Kesimpulan Akhir terhadap Standar Pelayanan:</label>
-                                <div class="grid gap-3">
-                                    ${['Setuju tanpa perbaikan', 'Setuju dengan perbaikan minor', 'Perlu dilakukan perbaikan'].map(v => `
-                                        <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-100/50 rounded-lg transition-colors">
-                                            <input type="radio" name="kesimpulan" value="${v}" class="w-4 h-4 text-blue-600"> 
-                                            <span class="font-medium text-blue-900">${v}</span>
-                                        </label>
-                                    `).join('')}
-                                </div>
+                            <div class="bg-blue-50 p-6 rounded-2xl border-blue-100 pl-14 ml-14">
+                                <label class="block font-bold text-blue-900 mb-4">Pilih Kesimpulan:</label>
+                                ${['Setuju tanpa perbaikan', 'Setuju dengan perbaikan minor', 'Perlu dilakukan perbaikan'].map(v => `
+                                    <label class="flex items-center gap-3 cursor-pointer p-2"><input type="radio" name="kesimpulan" value="${v}" class="w-4 h-4 text-blue-600"><span class="font-medium text-blue-900">${v}</span></label>
+                                `).join('')}
                             </div>
                         </div>
 
-                        <button id="btn-submit" onclick="submitReview()" class="hidden w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform active:scale-95 text-lg flex justify-center items-center gap-2">
-                            <i class="fas fa-paper-plane"></i> Kirim Form Review
-                        </button>
+                        <button id="btn-submit" onclick="submitReview()" class="hidden w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg">Kirim Form Review</button>
                     </div>
                 `;
             }
-            // ADMIN VIEW
             else if (pageId === 'hasil-review') {
                 html = `
-                    <div class="p-6 md:p-10 h-full flex flex-col max-w-7xl mx-auto">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                            <div>
-                                <h2 class="text-3xl font-extrabold text-slate-900">Matriks Hasil Review</h2>
-                                <p class="text-slate-500 mt-1">Pantau, analisis, dan ekspor data masukan stakeholder.</p>
-                            </div>
-                            <button onclick="window.exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-green-600/20 flex items-center gap-2 transition-all">
-                                <i class="fas fa-file-csv"></i> Ekspor Data CSV
-                            </button>
-                        </div>
-                        <div class="glass-card flex-1 overflow-hidden flex flex-col shadow-sm rounded-2xl border-t-4 border-indigo-500">
-                            <div class="overflow-x-auto flex-1">
-                                <table class="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr class="bg-slate-50 text-slate-600 text-sm border-b border-slate-200">
-                                            <th class="p-4 font-bold min-w-[200px]">Instansi</th>
-                                            <th class="p-4 font-bold min-w-[200px]">Layanan Direview</th>
-                                            <th class="p-4 font-bold min-w-[300px]">Usulan Utama</th>
-                                            <th class="p-4 font-bold">Kesimpulan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-reviews" class="text-sm divide-y divide-slate-100 bg-white">
-                                        <tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i> Memuat data...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="p-6 md:p-10 h-full flex flex-col"><div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-extrabold">Matriks Review</h2><button onclick="window.exportToCSV()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg"><i class="fas fa-file-csv"></i> Ekspor CSV</button></div>
+                    <div class="glass-card flex-1 overflow-auto shadow-sm rounded-2xl border-t-4 border-indigo-500"><table class="w-full text-left"><thead class="bg-slate-50 text-slate-600 border-b"><th class="p-4">Instansi</th><th class="p-4">Layanan</th><th class="p-4">Usulan Utama</th><th class="p-4">Kesimpulan</th></thead>
+                    <tbody id="table-reviews"><tr><td colspan="4" class="p-8 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div></div>
                 `;
                 setTimeout(loadReviewsData, 100);
             }
@@ -533,131 +448,80 @@ const analytics = getAnalytics(app);
         };
 
         // ==========================================
-        // 6. FORM LOGIC & DATABASE
+        // 7. FORM LOGIC & DATABASE
         // ==========================================
         window.generateQuestions = () => {
             const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
             const c = document.getElementById('q-container');
             const f = document.getElementById('final-container');
             const b = document.getElementById('btn-submit');
-
             if(!sel.length) { c.innerHTML=''; f.classList.add('hidden'); b.classList.add('hidden'); return; }
 
-            let html = `
-                <div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]">
-                    <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
-                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">2</div>
-                        <div>
-                            <h3 class="font-bold text-xl text-slate-800">Penilaian Skala Kuantitatif</h3>
-                            <p class="text-sm text-slate-500">Skala: 1 (Tidak Baik) - 4 (Sangat Baik)</p>
-                        </div>
-                    </div>
-            `;
-
+            let html = `<div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]"><div class="flex items-center gap-4 mb-6 border-b pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">2</div><div><h3 class="font-bold text-xl text-slate-800">Penilaian Skala Kuantitatif</h3><p class="text-sm text-slate-500">Skala: 1 (Tidak Baik) - 4 (Sangat Baik)</p></div></div>`;
             sel.forEach(k => {
                 const l = layananData[k];
-                html += `
-                    <div class="ml-14 mb-8 p-6 border border-slate-200 rounded-2xl bg-slate-50/50">
-                        <h4 class="font-bold text-${l.color}-700 mb-5 flex items-center gap-2"><i class="fas ${l.icon}"></i> ${l.judul}</h4>
-                        <div class="space-y-6">
-                            ${l.indikator.map((ind, idx) => `
-                                <div>
-                                    <p class="text-sm font-medium text-slate-700 mb-3">${idx+1}. ${ind}</p>
-                                    <div class="flex gap-2 scale-radio max-w-md">
-                                        ${[1,2,3,4].map(v => `
-                                            <div class="flex-1">
-                                                <input type="radio" id="s_${k}_${idx}_${v}" name="s_${k}_${idx}" value="${v}" class="hidden" required>
-                                                <label for="s_${k}_${idx}_${v}" class="block text-center py-2.5 border border-slate-300 bg-white rounded-lg cursor-pointer hover:bg-slate-50 text-sm font-bold text-slate-500 shadow-sm">${v}</label>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
+                html += `<div class="ml-14 mb-8 p-6 border rounded-2xl bg-slate-50/50"><h4 class="font-bold ${l.tema.text} mb-5 flex items-center gap-2"><i class="fas ${l.icon}"></i> ${l.judul}</h4><div class="space-y-6">` +
+                l.indikator.map((ind, idx) => `<div><p class="text-sm font-medium text-slate-700 mb-3">${idx+1}. ${ind}</p><div class="flex gap-2 scale-radio max-w-md">${[1,2,3,4].map(v => `<div class="flex-1"><input type="radio" id="s_${k}_${idx}_${v}" name="s_${k}_${idx}" value="${v}" class="hidden" required><label for="s_${k}_${idx}_${v}" class="block text-center py-2.5 border bg-white rounded-lg cursor-pointer text-sm font-bold shadow-sm">${v}</label></div>`).join('')}</div></div>`).join('') + `</div></div>`;
             });
-            c.innerHTML = html + `</div>`;
-            f.classList.remove('hidden'); b.classList.remove('hidden');
+            c.innerHTML = html + `</div>`; f.classList.remove('hidden'); b.classList.remove('hidden');
         };
 
         window.submitReview = async () => {
+            if(IS_PREVIEW) {
+                document.getElementById('content-area').innerHTML = `<div class="p-10 text-center"><h2 class="text-3xl font-bold">Terima Kasih!</h2><p>Data sukses tersimpan (Mode Preview).</p></div>`;
+                return;
+            }
+            
+            // Collect Data
             const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
             let complete = true; const skala = {};
-            
             sel.forEach(k => {
                 layananData[k].indikator.forEach((_, i) => {
                     const c = document.querySelector(`input[name="s_${k}_${i}"]:checked`);
-                    if(!c) complete = false;
-                    else { if(!skala[k]) skala[k]={}; skala[k][`ind_${i}`] = parseInt(c.value); }
+                    if(!c) complete = false; else { if(!skala[k]) skala[k]={}; skala[k][`ind_${i}`] = parseInt(c.value); }
                 });
             });
-
             const kes = document.querySelector(`input[name="kesimpulan"]:checked`);
+            
             if(!complete) return showToast('Lengkapi semua skala (1-4)', 'error');
             if(!kes) return showToast('Pilih Kesimpulan Akhir', 'error');
 
-            const payload = {
-                nama_instansi: stakeholderName,
-                layanan_dipilih: sel,
-                penilaian_skala: skala,
-                jawaban_terbuka: { 
-                    baik: document.getElementById('essay_baik').value || '-', 
-                    usulan: document.getElementById('essay_usulan').value || '-' 
-                },
-                kesimpulan_akhir: kes.value,
-                timestamp: IS_PREVIEW ? new Date() : serverTimestamp()
-            };
-
-            showLoader('Mengirim...');
+            showLoader();
             try {
-                if(!IS_PREVIEW) await addDoc(collection(db, "reviews"), payload);
-                else await new Promise(r => setTimeout(r, 1000));
-                
-                document.getElementById('content-area').innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-center p-6 text-center max-w-lg mx-auto">
-                        <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mb-6"><i class="fas fa-check"></i></div>
-                        <h2 class="text-3xl font-bold text-slate-800 mb-3">Terima Kasih!</h2>
-                        <p class="text-slate-600 mb-8">Masukan Anda telah terekam dan akan menjadi bahan evaluasi kami.</p>
-                        <button onclick="logout()" class="px-8 py-3 bg-white border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 shadow-sm">Kembali ke Awal</button>
-                    </div>`;
-            } catch (e) { showToast('Gagal mengirim', 'error'); }
+                await addDoc(collection(db, "reviews"), {
+                    nama_instansi: stakeholderName, layanan_dipilih: sel, penilaian_skala: skala,
+                    jawaban_terbuka: { usulan: document.getElementById('essay_usulan').value || '-' },
+                    kesimpulan_akhir: kes.value, timestamp: serverTimestamp()
+                });
+                document.getElementById('content-area').innerHTML = `<div class="p-10 text-center"><h2 class="text-3xl font-bold">Terima Kasih!</h2><p>Data sukses dikirim.</p></div>`;
+            } catch (e) { showToast('Gagal mengirim ke database', 'error'); }
             finally { hideLoader(); }
         };
 
-        // ADMIN FETCHER & EXPORT
+        // ADMIN FETCHER
         let currentReviewsData = [];
         const loadReviewsData = async () => {
             const tbody = document.getElementById('table-reviews');
             if(IS_PREVIEW) {
-                tbody.innerHTML = `<tr><td class="p-4 font-bold">PT Demo Telekomunikasi</td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">SP-01</span></td><td class="p-4 text-sm">"Percepat layanan"</td><td class="p-4"><span class="bg-slate-100 px-2 py-1 rounded text-xs">Setuju</span></td></tr>`;
-                return;
+                tbody.innerHTML = `<tr><td class="p-4 font-bold">PT Telkom</td><td class="p-4">SP-01</td><td class="p-4 italic">"Percepat layanan"</td><td class="p-4">Setuju</td></tr>`; return;
             }
             try {
                 const snap = await getDocs(collection(db, 'reviews'));
                 currentReviewsData = []; let html = '';
                 snap.forEach(d => {
                     const dt = d.data(); currentReviewsData.push(dt);
-                    html += `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 font-bold text-slate-800">${dt.nama_instansi}</td>
-                        <td class="p-4">${dt.layanan_dipilih.map(l=>`<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs mr-1 border border-slate-200 inline-block mb-1">${l}</span>`).join('')}</td>
-                        <td class="p-4 text-sm text-slate-600 italic">"${dt.jawaban_terbuka.usulan}"</td>
-                        <td class="p-4"><span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg">${dt.kesimpulan_akhir}</span></td>
-                    </tr>`;
+                    html += `<tr class="hover:bg-slate-50"><td class="p-4 font-bold text-slate-800">${dt.nama_instansi}</td><td class="p-4">${dt.layanan_dipilih.join(', ')}</td><td class="p-4 italic">"${dt.jawaban_terbuka.usulan}"</td><td class="p-4">${dt.kesimpulan_akhir}</td></tr>`;
                 });
                 tbody.innerHTML = html || '<tr><td colspan="4" class="p-8 text-center text-slate-500">Belum ada data masuk.</td></tr>';
             } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-red-500">Error memuat data</td></tr>`; }
         };
 
         window.exportToCSV = () => {
-            if(IS_PREVIEW) return showToast('Preview: Fitur Export Aktif', 'success');
+            if(IS_PREVIEW) return showToast('Fitur Export (Preview)', 'success');
             if(!currentReviewsData.length) return showToast('Data kosong', 'error');
             let csv = "Instansi,Layanan,Usulan,Kesimpulan\n";
             currentReviewsData.forEach(i => { csv += `"${i.nama_instansi}","${i.layanan_dipilih.join(', ')}","${i.jawaban_terbuka.usulan}","${i.kesimpulan_akhir}"\n`; });
-            const link = document.createElement("a");
-            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
-            link.download = "Hasil_Review_Balmon.csv";
+            const link = document.createElement("a"); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = "Hasil_Review.csv";
             document.body.appendChild(link); link.click(); link.remove();
         };
     </script>
