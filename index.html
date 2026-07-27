@@ -59,7 +59,9 @@
         
         <div class="glass w-full max-w-md p-8 rounded-3xl relative z-10">
             <div class="text-center mb-6 mt-2">
-                <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30 text-white text-2xl transform rotate-3"><i class="fas fa-tower-broadcast transform -rotate-3"></i></div>
+                <!-- LOGO DJID DI HALAMAN LOGIN -->
+                <img src="logo-djid.png" alt="Logo DJID" class="h-16 mx-auto mb-4 object-contain drop-shadow-sm">
+                
                 <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Balmon Kelas II Palu</h1>
                 <p class="text-sm text-slate-500 mt-1">Platform Reviu Kebijakan Pelayanan Publik</p>
             </div>
@@ -104,7 +106,11 @@
     <div id="main-layout" class="hidden h-screen flex flex-col md:flex-row bg-slate-50">
         <aside class="glass hidden md:flex flex-col w-72 h-full border-r border-slate-200 z-20">
             <div class="p-6 border-b border-slate-200">
-                <div class="flex items-center gap-3 text-slate-800 mb-1"><div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600"><i class="fas fa-tower-broadcast"></i></div><span class="font-bold text-lg tracking-tight">Balmon Palu</span></div>
+                <div class="flex items-center gap-3 text-slate-800 mb-1">
+                    <!-- LOGO DJID DI SIDEBAR -->
+                    <img src="logo-djid.png" alt="Logo DJID" class="h-8 w-auto object-contain">
+                    <span class="font-bold text-lg tracking-tight">Balmon Palu</span>
+                </div>
                 <div id="sidebar-role" class="mt-4"></div>
             </div>
             <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto" id="nav-desktop"></nav>
@@ -141,6 +147,7 @@
   appId: "1:479954097658:web:e542707151e3ad70e48043",
   measurementId: "G-LCFE1827CG"
 };
+
 
         let app, auth, db;
         try {
@@ -231,7 +238,7 @@
 
         let currentUserRole = null;
         let stakeholderData = { nama: '', jabatan: '', instansi: '' };
-        let signaturePad = null; // Variable for signature pad
+        let signaturePad = null; 
 
         window.showLoader = (msg='Memproses') => { document.getElementById('loader-text').innerText=msg; document.getElementById('global-loader').classList.remove('hidden'); }
         window.hideLoader = () => { document.getElementById('global-loader').classList.add('hidden'); }
@@ -407,11 +414,9 @@
             content.innerHTML = html;
         };
 
-        // Initialize Signature Pad when the canvas is in the DOM
         const initSignaturePad = () => {
             const canvas = document.getElementById('signature-pad');
             if(canvas) {
-                // Resize canvas properly for high DPI screens
                 const ratio =  Math.max(window.devicePixelRatio || 1, 1);
                 canvas.width = canvas.offsetWidth * ratio;
                 canvas.height = canvas.offsetHeight * ratio;
@@ -458,7 +463,6 @@
             });
             c.innerHTML = html + `</div>`; f.classList.remove('hidden'); b.classList.remove('hidden');
             
-            // Inisialisasi signature pad setelah elemen muncul di DOM
             setTimeout(initSignaturePad, 100);
         };
 
@@ -501,9 +505,6 @@
             } catch (e) { showToast('Gagal mengirim', 'error'); } finally { hideLoader(); }
         };
 
-        let currentReviewsData = [];
-        
-        // Helper function for formatting date and time
         const formatDateTime = (timestamp) => {
             if(!timestamp) return { date: '-', time: '-' };
             const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -524,7 +525,6 @@
                     const dtFormat = formatDateTime(dt.timestamp);
                     let kesBg = dt.kesimpulan_akhir.includes('tanpa') ? 'bg-green-50 text-green-700 border-green-200' : (dt.kesimpulan_akhir.includes('Perlu') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200');
                     
-                    // TTD Image element if available
                     let ttdHtml = dt.ttd_digital ? `<img src="${dt.ttd_digital}" class="h-10 mx-auto mt-1 border border-slate-200 rounded bg-white" alt="TTD">` : `<span class="text-[10px] text-slate-400 italic block mt-1">Tanpa TTD</span>`;
 
                     html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center font-bold text-slate-500">${no++}</td><td class="p-4"><p class="font-bold text-slate-800">${dt.profil_penilai.nama}</p><p class="text-xs text-slate-500">${dt.profil_penilai.jabatan} - <b>${dt.profil_penilai.instansi}</b></p></td><td class="p-4">${dt.layanan_dipilih.map(l=>`<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold border border-slate-200 mr-1 inline-block mb-1">${l}</span>`).join('')}</td><td class="p-4"><span class="${kesBg} px-3 py-1.5 rounded-lg text-[11px] font-bold border block w-max uppercase tracking-wide">${dt.kesimpulan_akhir}</span></td><td class="p-4 text-center"><p class="text-xs font-bold text-slate-700">${dtFormat.date}</p><p class="text-[10px] text-slate-500">${dtFormat.time}</p>${ttdHtml}</td></tr>`; 
@@ -537,7 +537,6 @@
             if(IS_PREVIEW) return showToast('Fitur Export Data Aktif (Preview)', 'success');
             if(!currentReviewsData.length) return showToast('Tidak ada data untuk diekspor', 'error');
             
-            // Update CSV Header
             let csv = "No,Tanggal Pengisian,Waktu,Nama Penilai,Jabatan,Instansi,Dokumen SP,No Komponen,Nama Komponen,Status Reviu,Catatan/Alasan,Kesimpulan Dokumen,Tanda Tangan Digital (Base64)\n";
             
             let no = 1;
