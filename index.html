@@ -134,11 +134,11 @@
         import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIG FIREBASE (Ubah IS_PREVIEW = false saat live)
+        // CONFIG FIREBASE (Pastikan IS_PREVIEW = false)
         // ==========================================
         let IS_PREVIEW = false; 
         
-       const firebaseConfig = {
+        const firebaseConfig = {
   apiKey: "AIzaSyDFxaM-yDYs_dlHfspUdbVk2akceTiGRII",
   authDomain: "reviu-sp.firebaseapp.com",
   projectId: "reviu-sp",
@@ -163,91 +163,21 @@
         }
 
         const layananData = {
-            'SP-01': {
-                judul: 'Asistensi & Konsultasi Perizinan SFR',
-                deskripsi: 'SK No 40 Tahun 2023 - Pelayanan asistensi perizinan spektrum frekuensi radio dan sertifikasi operator radio.',
-                icon: 'fa-user-tie',
-                tema: { border: 'border-blue-500', bg: 'bg-blue-100', text: 'text-blue-600', ring: 'focus:ring-blue-500' },
-                komponen: [
-                    { no: 2, nama: 'Persyaratan Pelayanan', isi: 'Permohonan dilengkapi data diri yang masih berlaku, jenis layanan, dan status permintaan.' },
-                    { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Melalui 3 kanal (Loket/Telepon/WA) -> Petugas mencatat -> Pemberian Asistensi -> Bantuan Perizinan -> Laporan.' },
-                    { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Maksimal 1 (satu) hari kerja.' },
-                    { no: 5, nama: 'Biaya / Tarif', isi: 'Tanpa biaya (gratis).' },
-                    { no: 6, nama: 'Produk Pelayanan', isi: 'Laporan penanganan permintaan konsultasi, asistensi, dan pengaduan.' },
-                    { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Kanal Loket, Telepon, WhatsApp. Sistem antrian, ruang tunggu, akses internet, komputer, sistem informasi pelayanan, sarana penunjang (parkir, toilet, musholla dll).' },
-                    { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, memahami peraturan, mampu mengoperasikan komputer, memiliki kemampuan manajerial & komunikasi interpersonal, menerapkan budaya pelayanan prima, memahami proses Perizinan SFR/SOR.' },
-                    { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Direktorat Operasi Sumber Daya, Pengawasan melekat atasan langsung.' },
-                    { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' },
-                    { no: 11, nama: 'Jumlah Pelaksana', isi: 'Kepala UPT, Ketua Tim Kerja Pelayanan Publik, Pegawai pelayanan (minimal 2 orang).' },
-                    { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik Pelayanan.' },
-                    { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Aplikasi antivirus/anti-malware, Non Disclosure Agreement (NDA), Petugas keamanan.' },
-                    { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monitoring & Evaluasi minimal 1x setahun oleh UPT. Survey Kepuasan Masyarakat.' }
-                ]
-            },
-            'SP-02': {
-                judul: 'Penyelenggaraan Ujian Negara Amatir Radio (UNAR) dan Sertifikasi Operator Radio',
-                deskripsi: 'SK No 41 Tahun 2023 - Pelaksanaan ujian negara bagi calon amatir radio menggunakan sistem CAT.',
-                icon: 'fa-laptop-code',
-                tema: { border: 'border-purple-500', bg: 'bg-purple-100', text: 'text-purple-600', ring: 'focus:ring-purple-500' },
-                komponen: [
-                    { no: 2, nama: 'Persyaratan Pelayanan', isi: 'Registrasi e-Licensing, email pribadi, KTP, Pas Foto latar merah, Surat Rekomendasi Organisasi, Surat izin orangtua (bagi <17 thn).' },
-                    { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Daftar online (iar-ikrap.postel.go.id) -> Pilih jadwal/lokasi -> Verifikasi Panitia -> Ujian CAT -> Pengumuman kelulusan.' },
-                    { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Penyelenggaraan UNAR s.d hasil kelulusan dilaksanakan dalam 1 (satu) hari.' },
-                    { no: 5, nama: 'Biaya / Tarif', isi: 'Sesuai Tarif PNBP (Peraturan Pemerintah Nomor 43 Tahun 2023).' },
-                    { no: 6, nama: 'Produk Pelayanan', isi: 'Hasil kelulusan UNAR.' },
-                    { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Website e-Licensing, Aplikasi CAT, Aplikasi Try-out, Kanal aduan/konsultasi, Sistem antrian, ruang tunggu, komputer, sarana penunjang.' },
-                    { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, memahami peraturan, mampu mengoperasikan komputer & sistem e-licensing/CAT, menerapkan budaya pelayanan prima.' },
-                    { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Auditor Penyelenggaraan UNAR Dit. Operasi Sumber Daya, Pengawasan atasan.' },
-                    { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' },
-                    { no: 11, nama: 'Jumlah Pelaksana', isi: 'Panitia: Ketua (1 org), Sekretaris (1 org), Anggota. Total panitia minimal 3 orang / maks 10% jumlah peserta.' },
-                    { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik Pelayanan.' },
-                    { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Aplikasi antivirus, Non Disclosure Agreement (NDA), Petugas keamanan.' },
-                    { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monitoring & Evaluasi minimal 1x setahun oleh UPT & Dit. Operasi Sumber Daya. Survey Kepuasan Masyarakat.' }
-                ]
-            },
-            'SP-03': {
-                judul: 'Penanganan Gangguan Penggunaan Spektrum Frekuensi Radio',
-                deskripsi: 'SK No 42 Tahun 2023 - Pelayanan penanganan laporan aduan gangguan penggunaan frekuensi radio.',
-                icon: 'fa-exclamation-triangle',
-                tema: { border: 'border-rose-500', bg: 'bg-rose-100', text: 'text-rose-600', ring: 'focus:ring-rose-500' },
-                komponen: [
-                    { no: 2, nama: 'Persyaratan Pelayanan', isi: 'Surat/Laporan Pengaduan (Nama, email, kontak, alamat, lokasi stasiun & freq terganggu, sifat/waktu gangguan), Nomor Salinan ISR (jika pengguna berizin), Bukti dukung (foto/video/rekaman).' },
-                    { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Penyampaian Laporan Luring/Daring -> Tanggapan/Klarifikasi -> Analisa Sumber -> Inspeksi -> Pelacakan -> Tindakan Penanganan -> Pemberitahuan hasil.' },
-                    { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Disesuaikan dengan klasifikasi gangguan (Berdasarkan Perdirjen SDPPI Nomor 6 Tahun 2020 pasal 18).' },
-                    { no: 5, nama: 'Biaya / Tarif', isi: 'Tanpa biaya (gratis).' },
-                    { no: 6, nama: 'Produk Pelayanan', isi: 'Laporan dilengkapi dengan Berita Acara Penanganan Gangguan.' },
-                    { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Sistem pelaporan online, kanal konsultasi, ruang tunggu, komputer, Perangkat Sistem Monitoring Frekuensi Radio (SMFR), Mobil Unit SMFR, sarana penunjang.' },
-                    { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, PPNS (Penyidik), Pengendali Frekuensi Radio, memahami peraturan, mampu mengoperasikan komputer, kemampuan manajerial & komunikasi, pelayanan prima.' },
-                    { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Dit. Pengendalian Sumber Daya, Pengawasan melekat atasan langsung.' },
-                    { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' },
-                    { no: 11, nama: 'Jumlah Pelaksana', isi: 'Kepala UPT, Ketua Tim Penanganan Gangguan, Pengendali Frekuensi Radio (min. 1 org), PPNS (min. 1 org).' },
-                    { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik Pelayanan, Pemeliharaan rutin perangkat SMFR.' },
-                    { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Aplikasi antivirus, Non Disclosure Agreement (NDA), Petugas keamanan.' },
-                    { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monitoring & Evaluasi minimal 1x setahun oleh UPT. Survey Kepuasan Masyarakat.' }
-                ]
-            }
+            'SP-01': { judul: 'Asistensi & Konsultasi Perizinan SFR', deskripsi: 'SK No 40 Tahun 2023 - Pelayanan asistensi perizinan spektrum frekuensi radio dan sertifikasi operator radio.', icon: 'fa-user-tie', tema: { border: 'border-blue-500', bg: 'bg-blue-100', text: 'text-blue-600', ring: 'focus:ring-blue-500' }, komponen: [{ no: 2, nama: 'Persyaratan Pelayanan', isi: 'Permohonan dilengkapi data diri yang masih berlaku, jenis layanan, dan status permintaan.' }, { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Melalui 3 kanal (Loket/Telepon/WA) -> Petugas mencatat -> Pemberian Asistensi -> Bantuan Perizinan -> Laporan.' }, { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Maksimal 1 (satu) hari kerja.' }, { no: 5, nama: 'Biaya / Tarif', isi: 'Tanpa biaya (gratis).' }, { no: 6, nama: 'Produk Pelayanan', isi: 'Laporan penanganan permintaan konsultasi, asistensi, dan pengaduan.' }, { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Kanal Loket, Telepon, WhatsApp. Sistem antrian, ruang tunggu, akses internet, komputer, sistem informasi pelayanan, sarana penunjang.' }, { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, memahami peraturan, mampu mengoperasikan komputer, manajerial & komunikasi, pelayanan prima.' }, { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Direktorat Operasi Sumber Daya, Pengawasan melekat.' }, { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' }, { no: 11, nama: 'Jumlah Pelaksana', isi: 'Kepala UPT, Ketua Tim Kerja Pelayanan Publik, Pegawai pelayanan (minimal 2 orang).' }, { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik.' }, { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Antivirus, Non Disclosure Agreement (NDA), Petugas keamanan.' }, { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monev minimal 1x setahun oleh UPT. Survey Kepuasan Masyarakat.' } ] },
+            'SP-02': { judul: 'Penyelenggaraan Ujian Negara Amatir Radio (UNAR) dan Sertifikasi Operator Radio', deskripsi: 'SK No 41 Tahun 2023 - Pelaksanaan ujian negara bagi calon amatir radio menggunakan sistem CAT.', icon: 'fa-laptop-code', tema: { border: 'border-purple-500', bg: 'bg-purple-100', text: 'text-purple-600', ring: 'focus:ring-purple-500' }, komponen: [{ no: 2, nama: 'Persyaratan Pelayanan', isi: 'Registrasi e-Licensing, email pribadi, KTP, Pas Foto, Surat Rekomendasi Organisasi.' }, { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Daftar online -> Pilih jadwal/lokasi -> Verifikasi Panitia -> Ujian CAT -> Pengumuman kelulusan.' }, { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Penyelenggaraan UNAR s.d hasil kelulusan dilaksanakan dalam 1 (satu) hari.' }, { no: 5, nama: 'Biaya / Tarif', isi: 'Sesuai Tarif PNBP (Peraturan Pemerintah Nomor 43 Tahun 2023).' }, { no: 6, nama: 'Produk Pelayanan', isi: 'Hasil kelulusan UNAR.' }, { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Website e-Licensing, Aplikasi CAT, Aplikasi Try-out, Kanal aduan/konsultasi, Sistem antrian, ruang tunggu.' }, { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, memahami peraturan, mampu mengoperasikan komputer & sistem e-licensing/CAT.' }, { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Auditor Penyelenggaraan UNAR Dit. Operasi Sumber Daya.' }, { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' }, { no: 11, nama: 'Jumlah Pelaksana', isi: 'Panitia: Ketua (1 org), Sekretaris (1 org), Anggota. Total panitia minimal 3 orang.' }, { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik.' }, { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Antivirus, Non Disclosure Agreement (NDA), Petugas keamanan.' }, { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monev minimal 1x setahun oleh UPT & Dit. Operasi Sumber Daya. Survey Kepuasan Masyarakat.' } ] },
+            'SP-03': { judul: 'Penanganan Gangguan Penggunaan Spektrum Frekuensi Radio', deskripsi: 'SK No 42 Tahun 2023 - Pelayanan penanganan laporan aduan gangguan penggunaan frekuensi radio.', icon: 'fa-exclamation-triangle', tema: { border: 'border-rose-500', bg: 'bg-rose-100', text: 'text-rose-600', ring: 'focus:ring-rose-500' }, komponen: [{ no: 2, nama: 'Persyaratan Pelayanan', isi: 'Surat/Laporan Pengaduan, Nomor Salinan ISR (jika pengguna berizin), Bukti dukung (foto/video/rekaman).' }, { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Penyampaian Laporan -> Tanggapan/Klarifikasi -> Analisa Sumber -> Inspeksi -> Pelacakan -> Tindakan Penanganan.' }, { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Disesuaikan dengan klasifikasi gangguan (Berdasarkan Perdirjen SDPPI Nomor 6 Tahun 2020).' }, { no: 5, nama: 'Biaya / Tarif', isi: 'Tanpa biaya (gratis).' }, { no: 6, nama: 'Produk Pelayanan', isi: 'Laporan dilengkapi dengan Berita Acara Penanganan Gangguan.' }, { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Sistem pelaporan online, kanal konsultasi, ruang tunggu, komputer, Perangkat SMFR, Mobil Unit SMFR.' }, { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, PPNS (Penyidik), Pengendali Frekuensi Radio, memahami peraturan.' }, { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Dit. Pengendalian Sumber Daya, Pengawasan atasan langsung.' }, { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' }, { no: 11, nama: 'Jumlah Pelaksana', isi: 'Kepala UPT, Ketua Tim Penanganan Gangguan, Pengendali Frekuensi Radio (min. 1 org), PPNS (min. 1 org).' }, { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik, Pemeliharaan rutin SMFR.' }, { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Antivirus, Non Disclosure Agreement (NDA), Petugas keamanan.' }, { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monev minimal 1x setahun oleh UPT. Survey Kepuasan Masyarakat.' } ] }
         };
 
-        const komponenSPNames = [
-            "Persyaratan Pelayanan", "Sistem, Mekanisme, dan Prosedur", "Jangka Waktu Penyelesaian",
-            "Biaya / Tarif", "Produk Pelayanan", "Sarana, Prasarana, dan/atau Fasilitas",
-            "Kompetensi Pelaksana", "Pengawas Internal", "Penanganan Pengaduan, Saran, dan Masukan",
-            "Jumlah Pelaksana", "Jaminan Pelayanan", "Jaminan Keamanan dan Keselamatan Pelayanan",
-            "Evaluasi Kinerja Pelaksana"
-        ];
+        const komponenSPNames = [ "Persyaratan Pelayanan", "Sistem, Mekanisme, dan Prosedur", "Jangka Waktu Penyelesaian", "Biaya / Tarif", "Produk Pelayanan", "Sarana, Prasarana, dan/atau Fasilitas", "Kompetensi Pelaksana", "Pengawas Internal", "Penanganan Pengaduan, Saran, dan Masukan", "Jumlah Pelaksana", "Jaminan Pelayanan", "Jaminan Keamanan dan Keselamatan Pelayanan", "Evaluasi Kinerja Pelaksana" ];
 
-        let currentUserRole = null;
-        let stakeholderData = { nama: '', jabatan: '', instansi: '' };
-        let signaturePad = null; 
+        let currentUserRole = null; let stakeholderData = { nama: '', jabatan: '', instansi: '' }; let signaturePad = null; 
 
         window.showLoader = (msg='Memproses') => { document.getElementById('loader-text').innerText=msg; document.getElementById('global-loader').classList.remove('hidden'); }
         window.hideLoader = () => { document.getElementById('global-loader').classList.add('hidden'); }
         window.showToast = (msg, type='info') => {
             const t = document.getElementById('toast'), c = document.getElementById('toast-content');
             document.getElementById('toast-msg').innerText = msg;
-            if(type==='error') c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-red-500 text-red-600 bg-red-50/90';
-            else if(type==='success') c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-green-500 text-green-700 bg-green-50/90';
-            else c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-blue-500 text-blue-700 bg-blue-50/90';
+            c.className = type==='error' ? 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-red-500 text-red-600 bg-red-50/90' : (type==='success' ? 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-green-500 text-green-700 bg-green-50/90' : 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-blue-500 text-blue-700 bg-blue-50/90');
             t.classList.remove('opacity-0', '-translate-y-5'); setTimeout(() => t.classList.add('opacity-0', '-translate-y-5'), 3500);
         }
 
@@ -262,16 +192,10 @@
             const nama = document.getElementById('sh-nama').value.trim();
             const jabatan = document.getElementById('sh-jabatan').value.trim();
             const instansi = document.getElementById('sh-instansi').value.trim();
-            
             if(!nama || !jabatan || !instansi) return showToast('Mohon lengkapi semua isian profil.', 'error');
-            
-            stakeholderData = { nama, jabatan, instansi };
-            currentUserRole = 'stakeholder';
-            document.getElementById('login-view').classList.add('hidden'); 
-            document.getElementById('main-layout').classList.remove('hidden');
-            setupNavigation(); 
-            navigate('beranda-stakeholder'); 
-            showToast(`Selamat datang, ${stakeholderData.nama}`, 'success');
+            stakeholderData = { nama, jabatan, instansi }; currentUserRole = 'stakeholder';
+            document.getElementById('login-view').classList.add('hidden'); document.getElementById('main-layout').classList.remove('hidden');
+            setupNavigation(); navigate('beranda-stakeholder'); showToast(`Selamat datang, ${stakeholderData.nama}`, 'success');
         }
 
         window.loginAdmin = async () => {
@@ -291,19 +215,11 @@
             currentUserRole = null; document.getElementById('main-layout').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden');
         }
 
-        const menuConfig = {
-            stakeholder: [{ id: 'beranda-stakeholder', icon: 'fa-file-pdf', label: 'Dokumen SP' }, { id: 'form-review', icon: 'fa-clipboard-list', label: 'Form Reviu Kebijakan' }],
-            admin: [{ id: 'hasil-review', icon: 'fa-chart-pie', label: 'Matriks & Ekspor' }]
-        };
+        const menuConfig = { stakeholder: [{ id: 'beranda-stakeholder', icon: 'fa-file-pdf', label: 'Dokumen SP' }, { id: 'form-review', icon: 'fa-clipboard-list', label: 'Form Reviu Kebijakan' }], admin: [{ id: 'hasil-review', icon: 'fa-chart-pie', label: 'Matriks & Ekspor' }] };
 
         const setupNavigation = () => {
-            const roleHtml = currentUserRole === 'admin' 
-                ? '<span class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-200"><i class="fas fa-shield-alt mr-1"></i> Admin Internal</span>' 
-                : `<div class="bg-blue-50 border border-blue-100 p-3 rounded-xl"><p class="text-[11px] font-bold text-blue-500 uppercase tracking-wider mb-1">Profil Penilai</p><p class="text-sm font-bold text-slate-800 line-clamp-1" title="${stakeholderData.nama}">${stakeholderData.nama}</p><p class="text-xs text-slate-600 mt-0.5 line-clamp-1" title="${stakeholderData.jabatan} - ${stakeholderData.instansi}">${stakeholderData.jabatan} <br><span class="font-medium text-slate-500">${stakeholderData.instansi}</span></p></div>`;
-            document.getElementById('sidebar-role').innerHTML = roleHtml;
-            
+            document.getElementById('sidebar-role').innerHTML = currentUserRole === 'admin' ? '<span class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-200"><i class="fas fa-shield-alt mr-1"></i> Admin Internal</span>' : `<div class="bg-blue-50 border border-blue-100 p-3 rounded-xl"><p class="text-[11px] font-bold text-blue-500 uppercase tracking-wider mb-1">Profil Penilai</p><p class="text-sm font-bold text-slate-800 line-clamp-1" title="${stakeholderData.nama}">${stakeholderData.nama}</p><p class="text-xs text-slate-600 mt-0.5 line-clamp-1" title="${stakeholderData.jabatan} - ${stakeholderData.instansi}">${stakeholderData.jabatan} <br><span class="font-medium text-slate-500">${stakeholderData.instansi}</span></p></div>`;
             document.getElementById('nav-desktop').innerHTML = menuConfig[currentUserRole].map(m => `<button onclick="navigate('${m.id}')" id="navD-${m.id}" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left font-medium text-slate-500 hover:bg-slate-100/50 hover:text-blue-600 transition-all border border-transparent"><i class="fas ${m.icon} w-5 text-center text-lg"></i> ${m.label}</button>`).join('');
-            
             let mobileMenus = [...menuConfig[currentUserRole]]; if(currentUserRole === 'admin') mobileMenus.push({id:'logout', icon:'fa-power-off', label:'Keluar'});
             document.getElementById('nav-mobile').innerHTML = mobileMenus.map(m => { if(m.id === 'logout') return `<button onclick="logout()" class="flex flex-col items-center w-16 text-red-500"><i class="fas ${m.icon} text-xl mb-1"></i><span class="text-[10px] font-bold">Keluar</span></button>`; return `<button onclick="navigate('${m.id}')" id="navM-${m.id}" class="flex flex-col items-center w-20 py-1 text-slate-400 hover:text-blue-600 transition-colors"><i class="fas ${m.icon} text-xl mb-1 transition-transform"></i><span class="text-[10px] font-bold text-center leading-tight">${m.label}</span></button>`}).join('');
         };
@@ -318,9 +234,8 @@
         };
 
         const renderPageContent = (pageId) => {
-            const content = document.getElementById('content-area');
-            let html = '';
-
+            const content = document.getElementById('content-area'); let html = '';
+            // --- BERANDA STAKEHOLDER ---
             if (pageId === 'beranda-stakeholder') {
                 html = `
                     <div class="p-6 md:p-10 max-w-7xl mx-auto">
@@ -329,7 +244,6 @@
                             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Executive Summary</h2>
                             <p class="text-slate-500 text-lg max-w-3xl">Silakan cermati ringkasan spesifikasi dari 3 dokumen SK Standar Pelayanan di bawah ini. Sebagai Stakeholder, Anda diminta memberikan reviu kualitatif pada Komponen No. 2 s.d 14 (Scroll ke bawah pada tiap kartu untuk membaca detail komponen).</p>
                         </header>
-
                         <div class="grid gap-6 md:grid-cols-3 mb-10 items-stretch">
                             ${Object.keys(layananData).map(k => `
                                 <div class="glass-card bento-hover p-6 rounded-[24px] ${layananData[k].tema.border} border-t-4 flex flex-col h-[600px] bg-white relative overflow-hidden group">
@@ -339,20 +253,13 @@
                                     </div>
                                     <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2 flex-shrink-0">${layananData[k].judul}</h3>
                                     <p class="text-[11px] text-blue-600 font-semibold mb-4 border-b pb-3 flex-shrink-0">${layananData[k].deskripsi}</p>
-                                    
                                     <div class="space-y-4 flex-1 overflow-y-auto pr-2 sp-content-scroll pb-4">
-                                        ${layananData[k].komponen.map(komp => `
-                                            <div>
-                                                <p class="text-[10px] uppercase font-bold text-slate-400 mb-1 leading-tight">${komp.no}. ${komp.nama}</p>
-                                                <p class="text-xs font-medium text-slate-700 leading-relaxed">${komp.isi}</p>
-                                            </div>
-                                        `).join('')}
+                                        ${layananData[k].komponen.map(komp => `<div><p class="text-[10px] uppercase font-bold text-slate-400 mb-1 leading-tight">${komp.no}. ${komp.nama}</p><p class="text-xs font-medium text-slate-700 leading-relaxed">${komp.isi}</p></div>`).join('')}
                                     </div>
                                     <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none rounded-b-[24px]"></div>
                                 </div>
                             `).join('')}
                         </div>
-
                         <div class="glass p-8 rounded-3xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex flex-col md:flex-row items-center justify-between gap-6">
                             <div><h4 class="font-bold text-slate-800 text-lg">Siap memberikan reviu?</h4><p class="text-slate-600 text-sm mt-1">Lanjutkan ke formulir reviu kebijakan untuk menilai komponen SP secara formal.</p></div>
                             <button onclick="navigate('form-review')" class="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl font-semibold transition-all shadow-lg active:scale-95">Buka Form Reviu <i class="fas fa-arrow-right ml-2"></i></button>
@@ -360,54 +267,46 @@
                     </div>
                 `;
             } 
+            // --- FORM REVIU STAKEHOLDER ---
             else if (pageId === 'form-review') {
                 html = `
                     <div class="p-6 md:p-10 max-w-5xl mx-auto pb-28">
-                        <header class="mb-8">
-                            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Formulir Reviu Standar Pelayanan</h2>
-                            <p class="text-slate-500 text-lg">Penilaian dan masukan formal terhadap dokumen SK Standar Pelayanan.</p>
-                        </header>
-                        
+                        <header class="mb-8"><h2 class="text-3xl font-extrabold text-slate-900 mb-2">Formulir Reviu Standar Pelayanan</h2><p class="text-slate-500 text-lg">Penilaian dan masukan formal terhadap dokumen SK Standar Pelayanan.</p></header>
                         <div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]">
                             <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">1</div><div><h3 class="font-bold text-xl text-slate-800">Pilih Dokumen Layanan</h3><p class="text-sm text-slate-500">Centang dokumen SP yang akan Anda reviu (bisa lebih dari satu):</p></div></div>
                             <div class="space-y-3 pl-14">
                                 ${Object.keys(layananData).map(k => `<label class="flex items-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors"><input type="checkbox" class="cb-layanan w-5 h-5 text-blue-600" value="${k}" onchange="generateQuestions()"><span class="ml-4 font-medium text-slate-700">${layananData[k].judul}</span></label>`).join('')}
                             </div>
                         </div>
-
                         <div id="q-container"></div>
-
                         <div id="final-container" class="hidden glass-card p-6 md:p-8 mb-8 rounded-[24px]">
                             <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">3</div><div><h3 class="font-bold text-xl text-slate-800">Kesimpulan & Tanda Tangan</h3></div></div>
                             <div class="space-y-6 pl-14 mb-8">
                                 <div><label class="block text-sm font-semibold mb-2 text-slate-700">Secara umum, bagian mana yang sudah baik dan patut dipertahankan?</label><textarea id="essay_baik" rows="2" class="w-full p-4 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
                                 <div><label class="block text-sm font-semibold mb-2 text-slate-700">Kesimpulan atau catatan penutup dari Anda terkait Standar Pelayanan ini?</label><textarea id="essay_usulan" rows="3" class="w-full p-4 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
                             </div>
-                            
                             <div class="bg-blue-50 p-6 rounded-2xl border-blue-100 pl-14 ml-14 mb-8">
                                 <label class="block font-bold text-blue-900 mb-4">Status Pengesahan Stakeholder terhadap Dokumen SP:</label>
                                 ${['Disetujui tanpa perubahan', 'Disetujui dengan catatan penyesuaian', 'Perlu dilakukan perubahan/revisi mendalam'].map(v => `<label class="flex items-center gap-3 cursor-pointer p-3 bg-white mb-2 border border-blue-100 hover:border-blue-300 rounded-xl transition-colors"><input type="radio" name="kesimpulan" value="${v}" class="w-4 h-4 text-blue-600"><span class="font-semibold text-blue-900">${v}</span></label>`).join('')}
                             </div>
-
                             <div class="pl-14">
                                 <label class="block text-sm font-semibold mb-2 text-slate-700">Tanda Tangan Digital Stakeholder</label>
                                 <p class="text-xs text-slate-500 mb-3">Silakan goreskan tanda tangan Anda pada kotak di bawah ini sebagai bentuk pengesahan.</p>
-                                <div class="relative">
-                                    <canvas id="signature-pad"></canvas>
-                                    <button onclick="clearSignature()" class="absolute top-2 right-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded text-xs font-semibold transition-colors">Hapus</button>
-                                </div>
+                                <div class="relative"><canvas id="signature-pad"></canvas><button onclick="clearSignature()" class="absolute top-2 right-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded text-xs font-semibold transition-colors">Hapus</button></div>
                             </div>
                         </div>
-
                         <button id="btn-submit" onclick="submitReview()" class="hidden w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 flex justify-center items-center gap-2"><i class="fas fa-paper-plane"></i> Kirim Dokumen Reviu</button>
                     </div>
                 `;
             }
+            // --- HASIL REVIEW (ADMIN) ---
             else if (pageId === 'hasil-review') {
                 html = `
-                    <div class="p-6 md:p-10 h-full flex flex-col"><div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-extrabold text-slate-900">Rekapitulasi Reviu SP</h2><button onclick="window.exportToCSV()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-green-700"><i class="fas fa-file-csv"></i> Ekspor CSV Detail</button></div>
-                    <div class="glass-card flex-1 overflow-auto shadow-sm rounded-2xl border-t-4 border-indigo-500"><table class="w-full text-left"><thead class="bg-slate-50 text-slate-600 border-b text-sm"><th class="p-4 w-12 text-center">No</th><th class="p-4">Profil Stakeholder</th><th class="p-4">Layanan Direviu</th><th class="p-4">Kesimpulan / Status</th><th class="p-4 text-center">Waktu & TTD</th></thead>
-                    <tbody id="table-reviews" class="divide-y divide-slate-100"><tr><td colspan="5" class="p-8 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div></div>
+                    <div class="p-6 md:p-10 h-full flex flex-col">
+                        <div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-extrabold text-slate-900">Rekapitulasi Reviu SP</h2><button onclick="window.exportToCSV()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-green-700"><i class="fas fa-file-csv"></i> Ekspor CSV Detail</button></div>
+                        <div class="glass-card flex-1 overflow-auto shadow-sm rounded-2xl border-t-4 border-indigo-500"><table class="w-full text-left"><thead class="bg-slate-50 text-slate-600 border-b text-sm"><th class="p-4 w-12 text-center">No</th><th class="p-4">Profil Stakeholder</th><th class="p-4">Layanan Direviu</th><th class="p-4">Kesimpulan / Status</th><th class="p-4 text-center">Waktu & TTD</th></thead>
+                        <tbody id="table-reviews" class="divide-y divide-slate-100"><tr><td colspan="5" class="p-8 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div>
+                    </div>
                 `;
                 setTimeout(loadReviewsData, 100);
             }
@@ -426,12 +325,7 @@
         };
 
         window.clearSignature = () => { if(signaturePad) signaturePad.clear(); };
-
-        window.toggleTextarea = (id, val) => {
-            const ta = document.getElementById(id);
-            if(val !== 'Sesuai') { ta.classList.add('show'); ta.setAttribute('required', 'true'); } 
-            else { ta.classList.remove('show'); ta.removeAttribute('required'); ta.value = ''; }
-        };
+        window.toggleTextarea = (id, val) => { const ta = document.getElementById(id); if(val !== 'Sesuai') { ta.classList.add('show'); ta.setAttribute('required', 'true'); } else { ta.classList.remove('show'); ta.removeAttribute('required'); ta.value = ''; } };
 
         window.generateQuestions = () => {
             const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
@@ -462,7 +356,6 @@
                 `).join('') + `</div></div>`;
             });
             c.innerHTML = html + `</div>`; f.classList.remove('hidden'); b.classList.remove('hidden');
-            
             setTimeout(initSignaturePad, 100);
         };
 
@@ -515,22 +408,36 @@
 
         const loadReviewsData = async () => {
             const tbody = document.getElementById('table-reviews');
-            if(IS_PREVIEW) { tbody.innerHTML = `<tr class="hover:bg-slate-50"><td class="p-4 text-center font-bold text-slate-500">1</td><td class="p-4"><p class="font-bold text-slate-800">Budi Santoso</p><p class="text-xs text-slate-500">Direktur - PT Demo</p></td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold border border-blue-200">SP-01</span></td><td class="p-4"><span class="bg-yellow-50 text-yellow-700 px-3 py-1.5 rounded-lg text-[10px] font-bold border block w-max uppercase tracking-wide">Disetujui dengan catatan</span></td><td class="p-4 text-center"><p class="text-xs font-bold text-slate-700">27/07/2026</p><p class="text-[10px] text-slate-500">11:45 WITA</p></td></tr>`; return; }
             
             try {
-                const snap = await getDocs(collection(db, 'reviews')); currentReviewsData = []; let html = '';
+                const snap = await getDocs(collection(db, 'reviews')); 
+                currentReviewsData = []; 
+                let html = '';
                 let no = 1;
+                
                 snap.forEach(d => { 
-                    const dt = d.data(); currentReviewsData.push(dt); 
+                    const dt = d.data(); 
+                    currentReviewsData.push(dt); 
                     const dtFormat = formatDateTime(dt.timestamp);
-                    let kesBg = dt.kesimpulan_akhir.includes('tanpa') ? 'bg-green-50 text-green-700 border-green-200' : (dt.kesimpulan_akhir.includes('Perlu') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200');
                     
+                    // PERLINDUNGAN DATA LAMA (Optional Chaining)
+                    let kesimpulan = dt.kesimpulan_akhir || 'Belum Dievaluasi';
+                    let kesBg = kesimpulan.includes('tanpa') ? 'bg-green-50 text-green-700 border-green-200' : (kesimpulan.includes('Perlu') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200');
                     let ttdHtml = dt.ttd_digital ? `<img src="${dt.ttd_digital}" class="h-10 mx-auto mt-1 border border-slate-200 rounded bg-white" alt="TTD">` : `<span class="text-[10px] text-slate-400 italic block mt-1">Tanpa TTD</span>`;
+                    
+                    // Fallback jika 'profil_penilai' kosong (untuk data lama)
+                    let namaUser = dt.profil_penilai?.nama || dt.nama_instansi || 'Anonim';
+                    let jabatanUser = dt.profil_penilai?.jabatan || '-';
+                    let instansiUser = dt.profil_penilai?.instansi || dt.nama_instansi || '-';
+                    let layananList = (dt.layanan_dipilih || []).map(l => `<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold border border-slate-200 mr-1 inline-block mb-1">${l}</span>`).join('');
 
-                    html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center font-bold text-slate-500">${no++}</td><td class="p-4"><p class="font-bold text-slate-800">${dt.profil_penilai.nama}</p><p class="text-xs text-slate-500">${dt.profil_penilai.jabatan} - <b>${dt.profil_penilai.instansi}</b></p></td><td class="p-4">${dt.layanan_dipilih.map(l=>`<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold border border-slate-200 mr-1 inline-block mb-1">${l}</span>`).join('')}</td><td class="p-4"><span class="${kesBg} px-3 py-1.5 rounded-lg text-[11px] font-bold border block w-max uppercase tracking-wide">${dt.kesimpulan_akhir}</span></td><td class="p-4 text-center"><p class="text-xs font-bold text-slate-700">${dtFormat.date}</p><p class="text-[10px] text-slate-500">${dtFormat.time}</p>${ttdHtml}</td></tr>`; 
+                    html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center font-bold text-slate-500">${no++}</td><td class="p-4"><p class="font-bold text-slate-800">${namaUser}</p><p class="text-xs text-slate-500">${jabatanUser} - <b>${instansiUser}</b></p></td><td class="p-4">${layananList}</td><td class="p-4"><span class="${kesBg} px-3 py-1.5 rounded-lg text-[11px] font-bold border block w-max uppercase tracking-wide">${kesimpulan}</span></td><td class="p-4 text-center"><p class="text-xs font-bold text-slate-700">${dtFormat.date}</p><p class="text-[10px] text-slate-500">${dtFormat.time}</p>${ttdHtml}</td></tr>`; 
                 });
                 tbody.innerHTML = html || '<tr><td colspan="5" class="p-8 text-center text-slate-500">Belum ada data reviu.</td></tr>';
-            } catch (e) { tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-red-500">Error memuat data</td></tr>`; }
+            } catch (e) { 
+                console.error("Gagal Render Tabel:", e);
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center"><i class="fas fa-exclamation-triangle mr-2"></i>Error memuat data. Kemungkinan ada bentrok struktur data lama. Silakan hapus data lama di Firebase.</td></tr>`; 
+            }
         };
 
         window.exportToCSV = () => {
@@ -542,16 +449,22 @@
             let no = 1;
             currentReviewsData.forEach(dt => { 
                 const dtFormat = formatDateTime(dt.timestamp);
-                const profil = `"${dt.profil_penilai.nama}","${dt.profil_penilai.jabatan}","${dt.profil_penilai.instansi}"`;
-                const kesimpulan = `"${dt.kesimpulan_akhir}"`;
+                
+                // Fallback Data Lama CSV
+                let namaUser = dt.profil_penilai?.nama || dt.nama_instansi || '-';
+                let jabatanUser = dt.profil_penilai?.jabatan || '-';
+                let instansiUser = dt.profil_penilai?.instansi || dt.nama_instansi || '-';
+
+                const profil = `"${namaUser}","${jabatanUser}","${instansiUser}"`;
+                const kesimpulan = `"${dt.kesimpulan_akhir || '-'}"`;
                 const ttdStr = dt.ttd_digital ? `"${dt.ttd_digital.substring(0, 30)}... (Gambar Base64)"` : '"-"';
                 
-                dt.layanan_dipilih.forEach(k => {
-                    const docName = `"${layananData[k].judul}"`;
+                (dt.layanan_dipilih || []).forEach(k => {
+                    const docName = `"${layananData[k]?.judul || k}"`;
                     if(dt.reviu_komponen && dt.reviu_komponen[k]) {
                         Object.keys(dt.reviu_komponen[k]).forEach(kompKey => {
                             const item = dt.reviu_komponen[k][kompKey];
-                            csv += `${no},"${dtFormat.date}","${dtFormat.time}",${profil},${docName},"${kompKey.replace('komp_','')}","${item.nama_komponen}","${item.status}","${item.catatan.replace(/"/g, '""')}",${kesimpulan},${ttdStr}\n`;
+                            csv += `${no},"${dtFormat.date}","${dtFormat.time}",${profil},${docName},"${kompKey.replace('komp_','')}","${item.nama_komponen || '-'}","${item.status || '-'}","${(item.catatan || '').replace(/"/g, '""')}",${kesimpulan},${ttdStr}\n`;
                             no++;
                         });
                     }
