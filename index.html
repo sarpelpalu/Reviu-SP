@@ -160,23 +160,21 @@
         // ==========================================
         // 1. CONFIG: UBAH IS_PREVIEW JADI FALSE JIKA SUDAH SIAP LIVE
         // ==========================================
-        const IS_PREVIEW = true; // <-- GANTI KE FALSE NANTI
+        const IS_PREVIEW = false; // <-- GANTI KE FALSE NANTI
         
-        const firebaseConfig = {
-            apiKey: "API_KEY_ANDA",
-            authDomain: "PROJECT_ID.firebaseapp.com",
-            projectId: "PROJECT_ID",
-            storageBucket: "PROJECT_ID.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
-        };
+     const firebaseConfig = {
+  apiKey: "AIzaSyDFxaM-yDYs_dlHfspUdbVk2akceTiGRII",
+  authDomain: "reviu-sp.firebaseapp.com",
+  projectId: "reviu-sp",
+  storageBucket: "reviu-sp.firebasestorage.app",
+  messagingSenderId: "479954097658",
+  appId: "1:479954097658:web:e542707151e3ad70e48043",
+  measurementId: "G-LCFE1827CG"
+};
 
-        let app, auth, db;
-        if (!IS_PREVIEW) {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        }
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
         // ==========================================
         // 2. DATA LAYANAN (SUDAH DIKOREKSI & DIGABUNG)
