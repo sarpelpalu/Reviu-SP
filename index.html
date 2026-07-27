@@ -17,6 +17,12 @@
         .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; }
         .bento-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(59, 130, 246, 0.15); border-color: #bfdbfe; }
         
+        /* Custom Scrollbar for the SP Cards */
+        .sp-content-scroll::-webkit-scrollbar { width: 6px; }
+        .sp-content-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .sp-content-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .sp-content-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -137,7 +143,6 @@
   measurementId: "G-LCFE1827CG"
 };
 
-
         let app, auth, db;
         try {
             if (!IS_PREVIEW) {
@@ -152,49 +157,75 @@
         }
 
         // ==========================================
-        // 2. DATA LAYANAN SESUAI PDF (DOKUMEN SP)
+        // 2. DATA LAYANAN SESUAI PDF (DOKUMEN SP) No. 2 - 14
         // ==========================================
         const layananData = {
             'SP-01': {
-                judul: 'Asistensi & Konsultasi Perizinan SFR',
-                deskripsi: 'SK No 40 Tahun 2023 - Pelayanan asistensi perizinan spektrum frekuensi radio dan sertifikasi operator radio.',
+                judul: 'Asistensi & Konsultasi Perizinan SFR dan Sertifikasi Operator Radio',
+                deskripsi: 'SK No 40 Tahun 2023 - Pelayanan asistensi perizinan spektrum frekuensi radio.',
                 icon: 'fa-user-tie',
                 tema: { border: 'border-blue-500', bg: 'bg-blue-100', text: 'text-blue-600', ring: 'focus:ring-blue-500' },
-                ringkasan: {
-                    persyaratan: 'Permohonan dilengkapi data diri yang masih berlaku, jenis layanan, dan status permintaan.',
-                    prosedur: 'Melalui 3 kanal (Loket/Telepon/WA) -> Petugas mencatat -> Pemberian Asistensi -> Bantuan Perizinan -> Laporan.',
-                    waktu: 'Maksimal 1 (satu) hari kerja.',
-                    biaya: 'Tanpa biaya (gratis).',
-                }
+                komponen: [
+                    { no: 2, nama: 'Persyaratan Pelayanan', isi: 'Permohonan dilengkapi data diri yang masih berlaku, jenis layanan, dan status permintaan.' },
+                    { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Melalui 3 kanal (Loket/Telepon/WA) -> Petugas mencatat -> Pemberian Asistensi -> Bantuan Perizinan -> Laporan.' },
+                    { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Maksimal 1 (satu) hari kerja.' },
+                    { no: 5, nama: 'Biaya / Tarif', isi: 'Tanpa biaya (gratis).' },
+                    { no: 6, nama: 'Produk Pelayanan', isi: 'Laporan penanganan permintaan konsultasi, asistensi, dan pengaduan.' },
+                    { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Kanal Loket, Telepon, WhatsApp. Sistem antrian, ruang tunggu, akses internet, komputer, sistem informasi pelayanan, sarana penunjang (parkir, toilet, musholla dll).' },
+                    { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, memahami peraturan, mampu mengoperasikan komputer, memiliki kemampuan manajerial & komunikasi interpersonal, menerapkan budaya pelayanan prima, memahami proses Perizinan SFR/SOR.' },
+                    { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Direktorat Operasi Sumber Daya, Pengawasan melekat atasan langsung.' },
+                    { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' },
+                    { no: 11, nama: 'Jumlah Pelaksana', isi: 'Kepala UPT, Ketua Tim Kerja Pelayanan Publik, Pegawai pelayanan (minimal 2 orang).' },
+                    { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik Pelayanan.' },
+                    { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Aplikasi antivirus/anti-malware, Non Disclosure Agreement (NDA), Petugas keamanan.' },
+                    { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monitoring & Evaluasi minimal 1x setahun oleh UPT. Survey Kepuasan Masyarakat.' }
+                ]
             },
             'SP-02': {
-                judul: 'Penyelenggaraan Ujian Negara Amatir Radio (UNAR) dan Sertifikasi Operator Radio',
+                judul: 'Penyelenggaraan Ujian Negara Amatir Radio (UNAR) dan sertifikasi operator radio',
                 deskripsi: 'SK No 41 Tahun 2023 - Pelaksanaan ujian negara bagi calon amatir radio menggunakan sistem CAT.',
                 icon: 'fa-laptop-code',
                 tema: { border: 'border-purple-500', bg: 'bg-purple-100', text: 'text-purple-600', ring: 'focus:ring-purple-500' },
-                ringkasan: {
-                    persyaratan: 'Registrasi e-Licensing, KTP, Pas Foto latar merah, Surat Rekomendasi Organisasi.',
-                    prosedur: 'Daftar online (iar-ikrap.postel.go.id) -> Pilih jadwal -> Verifikasi -> Ujian CAT -> Pengumuman.',
-                    waktu: '1 (satu) hari.',
-                    biaya: 'Sesuai Tarif PNBP (PP Nomor 43 Tahun 2023).',
-                }
+                komponen: [
+                    { no: 2, nama: 'Persyaratan Pelayanan', isi: 'Registrasi e-Licensing, email pribadi, KTP, Pas Foto latar merah, Surat Rekomendasi Organisasi, Surat izin orangtua (bagi <17 thn).' },
+                    { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Daftar online (iar-ikrap.postel.go.id) -> Pilih jadwal/lokasi -> Verifikasi Panitia -> Ujian CAT -> Pengumuman kelulusan.' },
+                    { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Penyelenggaraan UNAR s.d hasil kelulusan dilaksanakan dalam 1 (satu) hari.' },
+                    { no: 5, nama: 'Biaya / Tarif', isi: 'Sesuai Tarif PNBP (Peraturan Pemerintah Nomor 43 Tahun 2023).' },
+                    { no: 6, nama: 'Produk Pelayanan', isi: 'Hasil kelulusan UNAR.' },
+                    { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Website e-Licensing, Aplikasi CAT, Aplikasi Try-out, Kanal aduan/konsultasi, Sistem antrian, ruang tunggu, komputer, sarana penunjang.' },
+                    { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, memahami peraturan, mampu mengoperasikan komputer & sistem e-licensing/CAT, menerapkan budaya pelayanan prima.' },
+                    { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Auditor Penyelenggaraan UNAR Dit. Operasi Sumber Daya, Pengawasan atasan.' },
+                    { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' },
+                    { no: 11, nama: 'Jumlah Pelaksana', isi: 'Panitia: Ketua (1 org), Sekretaris (1 org), Anggota. Total panitia minimal 3 orang / maks 10% jumlah peserta.' },
+                    { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik Pelayanan.' },
+                    { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Aplikasi antivirus, Non Disclosure Agreement (NDA), Petugas keamanan.' },
+                    { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monitoring & Evaluasi minimal 1x setahun oleh UPT & Dit. Operasi Sumber Daya. Survey Kepuasan Masyarakat.' }
+                ]
             },
             'SP-03': {
                 judul: 'Penanganan Gangguan Penggunaan Spektrum Frekuensi Radio',
                 deskripsi: 'SK No 42 Tahun 2023 - Pelayanan penanganan laporan aduan gangguan penggunaan frekuensi radio.',
                 icon: 'fa-exclamation-triangle',
                 tema: { border: 'border-rose-500', bg: 'bg-rose-100', text: 'text-rose-600', ring: 'focus:ring-rose-500' },
-                ringkasan: {
-                    persyaratan: 'Surat/Laporan Pengaduan, Nomor Salinan ISR (jika berizin), Bukti dukung (foto/video/rekaman).',
-                    prosedur: 'Laporan Luring/Daring -> Klarifikasi -> Analisa Sumber -> Inspeksi -> Pelacakan -> Penindakan.',
-                    waktu: 'Sesuai klasifikasi gangguan (Perdirjen No 6 Tahun 2020).',
-                    biaya: 'Tanpa biaya (gratis).',
-                }
+                komponen: [
+                    { no: 2, nama: 'Persyaratan Pelayanan', isi: 'Surat/Laporan Pengaduan (Nama, email, kontak, alamat, lokasi stasiun & freq terganggu, sifat/waktu gangguan), Nomor Salinan ISR (jika pengguna berizin), Bukti dukung (foto/video/rekaman).' },
+                    { no: 3, nama: 'Sistem, Mekanisme, dan Prosedur', isi: 'Penyampaian Laporan Luring/Daring -> Tanggapan/Klarifikasi -> Analisa Sumber -> Inspeksi -> Pelacakan -> Tindakan Penanganan -> Pemberitahuan hasil.' },
+                    { no: 4, nama: 'Jangka Waktu Penyelesaian', isi: 'Disesuaikan dengan klasifikasi gangguan (Berdasarkan Perdirjen SDPPI Nomor 6 Tahun 2020 pasal 18).' },
+                    { no: 5, nama: 'Biaya / Tarif', isi: 'Tanpa biaya (gratis).' },
+                    { no: 6, nama: 'Produk Pelayanan', isi: 'Laporan dilengkapi dengan Berita Acara Penanganan Gangguan.' },
+                    { no: 7, nama: 'Sarana, Prasarana, dan/atau Fasilitas', isi: 'Sistem pelaporan online, kanal konsultasi, ruang tunggu, komputer, Perangkat Sistem Monitoring Frekuensi Radio (SMFR), Mobil Unit SMFR, sarana penunjang.' },
+                    { no: 8, nama: 'Kompetensi Pelaksana', isi: 'ASN Kemenkominfo, PPNS (Penyidik), Pengendali Frekuensi Radio, memahami peraturan, mampu mengoperasikan komputer, kemampuan manajerial & komunikasi, pelayanan prima.' },
+                    { no: 9, nama: 'Pengawas Internal', isi: 'Inspektorat Jenderal Kementerian Kominfo, Dit. Pengendalian Sumber Daya, Pengawasan melekat atasan langsung.' },
+                    { no: 10, nama: 'Penanganan Pengaduan, Saran, dan Masukan', isi: 'LAPOR!, Contact Center 159 ext.2, Telepon/WA Balmon Palu, Loket, Media Sosial.' },
+                    { no: 11, nama: 'Jumlah Pelaksana', isi: 'Kepala UPT, Ketua Tim Penanganan Gangguan, Pengendali Frekuensi Radio (min. 1 org), PPNS (min. 1 org).' },
+                    { no: 12, nama: 'Jaminan Pelayanan', isi: 'Core Values BERAKHLAK, Maklumat Pelayanan, Sertifikat ISO 9001:2015, Kode Etik Pelayanan, Pemeliharaan rutin perangkat SMFR.' },
+                    { no: 13, nama: 'Jaminan Keamanan dan Keselamatan Pelayanan', isi: 'Aplikasi antivirus, Non Disclosure Agreement (NDA), Petugas keamanan.' },
+                    { no: 14, nama: 'Evaluasi Kinerja Pelaksana', isi: 'Monitoring & Evaluasi minimal 1x setahun oleh UPT. Survey Kepuasan Masyarakat.' }
+                ]
             }
         };
 
-        // KOMPONEN PENILAIAN SESUAI TABEL DOKUMEN (No 2 - 14)
-        const komponenSP = [
+        const komponenSPNames = [
             "Persyaratan Pelayanan",
             "Sistem, Mekanisme, dan Prosedur",
             "Jangka Waktu Penyelesaian",
@@ -209,6 +240,7 @@
             "Jaminan Keamanan dan Keselamatan Pelayanan",
             "Evaluasi Kinerja Pelaksana"
         ];
+
 
         // ==========================================
         // 3. UI UTILITIES & STATE
@@ -302,28 +334,37 @@
 
             if (pageId === 'beranda-stakeholder') {
                 html = `
-                    <div class="p-6 md:p-10 max-w-6xl mx-auto">
-                        <header class="mb-10">
+                    <div class="p-6 md:p-10 max-w-7xl mx-auto">
+                        <header class="mb-8">
                             <span class="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block tracking-widest uppercase">Dokumen Standar Pelayanan</span>
                             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Executive Summary</h2>
-                            <p class="text-slate-500 text-lg max-w-3xl">Silakan cermati spesifikasi dari 3 dokumen SK Standar Pelayanan di bawah ini. Sebagai Stakeholder, Anda diminta memberikan reviu kualitatif pada Komponen No. 2 s.d 14 di masing-masing dokumen.</p>
+                            <p class="text-slate-500 text-lg max-w-3xl">Silakan cermati ringkasan spesifikasi dari 3 dokumen SK Standar Pelayanan di bawah ini. Sebagai Stakeholder, Anda diminta memberikan reviu kualitatif pada Komponen No. 2 s.d 14 (Scroll ke bawah pada tiap kartu untuk membaca detail komponen).</p>
                         </header>
 
-                        <div class="grid gap-6 md:grid-cols-3 mb-10">
+                        <div class="grid gap-6 md:grid-cols-3 mb-10 items-stretch">
                             ${Object.keys(layananData).map(k => `
-                                <div class="glass-card bento-hover p-6 rounded-[24px] ${layananData[k].tema.border} border-t-4 flex flex-col h-full bg-white relative overflow-hidden group">
-                                    <div class="flex justify-between items-start mb-4">
+                                <div class="glass-card bento-hover p-6 rounded-[24px] ${layananData[k].tema.border} border-t-4 flex flex-col h-[600px] bg-white relative overflow-hidden group">
+                                    
+                                    <!-- Header Card -->
+                                    <div class="flex justify-between items-start mb-4 flex-shrink-0">
                                         <div class="w-12 h-12 ${layananData[k].tema.bg} rounded-2xl flex items-center justify-center ${layananData[k].tema.text} text-xl group-hover:scale-110 transition-transform"><i class="fas ${layananData[k].icon}"></i></div>
                                         <span class="bg-slate-100 text-slate-500 text-xs font-bold px-2 py-1 rounded">${k}</span>
                                     </div>
-                                    <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">${layananData[k].judul}</h3>
-                                    <p class="text-[11px] text-blue-600 font-semibold mb-4 border-b pb-3">${layananData[k].deskripsi}</p>
-                                    <div class="space-y-3 flex-1">
-                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">2. Persyaratan</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.persyaratan}</p></div>
-                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">3. Prosedur</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.prosedur}</p></div>
-                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">4. Waktu</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.waktu}</p></div>
-                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">5. Biaya</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.biaya}</p></div>
+                                    <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2 flex-shrink-0">${layananData[k].judul}</h3>
+                                    <p class="text-[11px] text-blue-600 font-semibold mb-4 border-b pb-3 flex-shrink-0">${layananData[k].deskripsi}</p>
+                                    
+                                    <!-- Scrollable Content for SP Components 2-14 -->
+                                    <div class="space-y-4 flex-1 overflow-y-auto pr-2 sp-content-scroll pb-4">
+                                        ${layananData[k].komponen.map(komp => `
+                                            <div>
+                                                <p class="text-[10px] uppercase font-bold text-slate-400 mb-1 leading-tight">${komp.no}. ${komp.nama}</p>
+                                                <p class="text-xs font-medium text-slate-700 leading-relaxed">${komp.isi}</p>
+                                            </div>
+                                        `).join('')}
                                     </div>
+                                    
+                                    <!-- Gradient indicator for scrolling -->
+                                    <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none rounded-b-[24px]"></div>
                                 </div>
                             `).join('')}
                         </div>
@@ -398,7 +439,7 @@
             sel.forEach(k => {
                 const l = layananData[k];
                 html += `<div class="ml-14 mb-10 p-6 border rounded-2xl bg-slate-50/50"><h4 class="font-bold ${l.tema.text} mb-6 flex items-center gap-2 pb-3 border-b border-slate-200"><i class="fas ${l.icon} text-xl"></i> ${l.judul}</h4><div class="space-y-6">` +
-                komponenSP.map((komp, idx) => `
+                komponenSPNames.map((komp, idx) => `
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <p class="text-sm font-bold text-slate-800 mb-3">${idx+2}. ${komp}</p>
                         <div class="grid md:grid-cols-3 gap-3">
@@ -425,7 +466,7 @@
             
             sel.forEach(k => {
                 hasilReviu[k] = {};
-                komponenSP.forEach((komp, i) => {
+                komponenSPNames.forEach((komp, i) => {
                     const c = document.querySelector(`input[name="st_${k}_${i}"]:checked`);
                     if(!c) complete = false; 
                     else { 
