@@ -9,28 +9,10 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- PWA Manifest Injection (Tanpa Blob Service Worker agar aman di Vercel/Blogger) -->
-    <script>
-        const manifestData = {
-            name: "Review SP Balmon",
-            short_name: "Review SP",
-            start_url: ".",
-            display: "standalone",
-            background_color: "#f8fafc",
-            theme_color: "#3b82f6",
-            icons: [{ src: "https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png", sizes: "192x192", type: "image/png" }]
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-        const manifestUrl = URL.createObjectURL(manifestBlob);
-        document.write(`<link rel="manifest" href="${manifestUrl}">`);
-    </script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; margin: 0; min-height: 100vh; }
         
-        /* Modern UI/UX Styles */
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
         .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; }
         .bento-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(59, 130, 246, 0.15); border-color: #bfdbfe; }
@@ -38,130 +20,112 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         .loader { border: 3px solid #f1f5f9; border-top: 3px solid #3b82f6; border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Custom Radio */
-        .scale-radio input:checked + label { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); }
-        .scale-radio label { transition: all 0.2s ease; }
+        /* Custom Radio Form Review */
+        .status-radio input:checked + div { background-color: #eff6ff; border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+        .status-radio input:checked + div span.radio-dot { background-color: #3b82f6; border-color: #3b82f6; }
+        
+        .textarea-collapse { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; overflow: hidden; max-height: 0; opacity: 0; }
+        .textarea-collapse.show { max-height: 200px; opacity: 1; margin-top: 0.75rem; }
     </style>
 </head>
-<body class="overflow-hidden">
+<body class="overflow-x-hidden">
 
     <!-- GLOBAL LOADER -->
-    <div id="global-loader" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+    <div id="global-loader" class="fixed inset-0 bg-slate-50/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center hidden">
         <div class="loader w-12 h-12 border-4 mb-4"></div>
         <p class="font-semibold text-slate-600 tracking-wide" id="loader-text">Memproses...</p>
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 opacity-0 pointer-events-none">
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-300 opacity-0 pointer-events-none">
         <div class="glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg" id="toast-content">
             <i class="fas fa-info-circle text-blue-500"></i> <span id="toast-msg">Notifikasi</span>
         </div>
     </div>
 
-    <!-- 1. HALAMAN LOGIN (OPEN ACCESS & ADMIN) -->
+    <!-- 1. HALAMAN LOGIN -->
     <div id="login-view" class="min-h-screen flex items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
-        <!-- Background Ornaments -->
         <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
         
         <div class="glass w-full max-w-md p-8 rounded-3xl relative z-10">
-            <div class="text-center mb-8 mt-2">
-                <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/30 text-white text-2xl transform rotate-3">
-                    <i class="fas fa-tower-broadcast transform -rotate-3"></i>
-                </div>
+            <div class="text-center mb-6 mt-2">
+                <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30 text-white text-2xl transform rotate-3"><i class="fas fa-tower-broadcast transform -rotate-3"></i></div>
                 <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Balmon Kelas II Palu</h1>
-                <p class="text-sm text-slate-500 mt-2">Platform Konsultasi & Review SP Publik</p>
+                <p class="text-sm text-slate-500 mt-1">Platform Reviu Kebijakan Pelayanan Publik</p>
             </div>
 
-            <!-- Tabs -->
-            <div class="flex mb-8 bg-slate-100/80 rounded-xl p-1.5 border border-slate-200">
+            <div class="flex mb-6 bg-slate-100/80 rounded-xl p-1.5 border border-slate-200">
                 <button onclick="switchLoginTab('stakeholder')" id="tab-stakeholder" class="flex-1 py-2.5 text-sm font-semibold rounded-lg shadow-sm bg-white text-blue-600 transition-all">Stakeholder</button>
                 <button onclick="switchLoginTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all">Tim Internal</button>
             </div>
 
-            <!-- Form Stakeholder -->
+            <!-- FORM STAKEHOLDER (Diperbarui dengan 3 Isian) -->
             <div id="form-stakeholder">
-                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-6">
-                    <p class="text-xs text-blue-800 text-center leading-relaxed">Sistem Akses Terbuka. Silahkan masukkan <b>Nama dan Instansi</b> Anda untuk memulai.</p>
+                <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 mb-5">
+                    <p class="text-xs text-blue-800 text-center leading-relaxed">Sistem Akses Terbuka. Mohon lengkapi profil Anda sebelum mereviu Standar Pelayanan.</p>
                 </div>
-                <div class="mb-6">
-                    <input type="text" id="instansi-input" placeholder="Contoh: Fulan / PT Telekomunikasi / ORARI" class="w-full px-5 py-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-center font-medium bg-white/50">
+                
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 uppercase tracking-wider">Nama Lengkap</label>
+                        <input type="text" id="sh-nama" placeholder="Contoh: Budi Santoso, S.T." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium bg-white/60">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 uppercase tracking-wider">Jabatan</label>
+                        <input type="text" id="sh-jabatan" placeholder="Contoh: Direktur / Anggota" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium bg-white/60">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 uppercase tracking-wider">Instansi / Organisasi</label>
+                        <input type="text" id="sh-instansi" placeholder="Contoh: PT Telekomunikasi / ORARI" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium bg-white/60">
+                    </div>
                 </div>
-                <button onclick="loginStakeholder()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all transform active:scale-95 flex justify-center items-center gap-2">
-                    Masuk & Review <i class="fas fa-arrow-right text-sm"></i>
-                </button>
+
+                <button onclick="loginStakeholder()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">Mulai Reviu <i class="fas fa-arrow-right text-sm"></i></button>
             </div>
 
-            <!-- Form Admin -->
+            <!-- FORM ADMIN -->
             <div id="form-admin" class="hidden">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Email</label>
-                    <input type="email" id="admin-email" placeholder="admin@balmonpalu.go.id" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/50">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Password</label>
-                    <input type="password" id="admin-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/50">
-                </div>
-                <button onclick="loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all transform active:scale-95 flex justify-center items-center gap-2">
-                    <i class="fas fa-lock"></i> Login Dashboard
-                </button>
+                <div class="mb-4"><label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 uppercase tracking-wider">Email Admin</label><input type="email" id="admin-email" placeholder="admin@balmonpalu.go.id" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/60"></div>
+                <div class="mb-6"><label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 uppercase tracking-wider">Password</label><input type="password" id="admin-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/60"></div>
+                <button onclick="loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"><i class="fas fa-lock"></i> Login Dashboard</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. MAIN APP LAYOUT (POST-LOGIN) -->
+    <!-- 2. MAIN APP LAYOUT -->
     <div id="main-layout" class="hidden h-screen flex flex-col md:flex-row bg-slate-50">
-        
-        <!-- SIDEBAR (Desktop) -->
         <aside class="glass hidden md:flex flex-col w-72 h-full border-r border-slate-200 z-20">
             <div class="p-6 border-b border-slate-200">
-                <div class="flex items-center gap-3 text-slate-800 mb-1">
-                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600"><i class="fas fa-tower-broadcast"></i></div>
-                    <span class="font-bold text-lg tracking-tight">Balmon Palu</span>
-                </div>
+                <div class="flex items-center gap-3 text-slate-800 mb-1"><div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600"><i class="fas fa-tower-broadcast"></i></div><span class="font-bold text-lg tracking-tight">Balmon Palu</span></div>
                 <div id="sidebar-role" class="mt-4"></div>
             </div>
-            
-            <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto" id="nav-desktop">
-                <!-- Injected via JS -->
-            </nav>
-
+            <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto" id="nav-desktop"></nav>
             <div class="p-4 border-t border-slate-200">
-                <button onclick="logout()" class="flex items-center justify-center gap-2 px-4 py-2.5 w-full text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors text-sm font-semibold">
-                    <i class="fas fa-sign-out-alt"></i> Akhiri Sesi
-                </button>
+                <button onclick="logout()" class="flex items-center justify-center gap-2 px-4 py-2.5 w-full text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors text-sm font-semibold"><i class="fas fa-sign-out-alt"></i> Akhiri Sesi</button>
             </div>
         </aside>
 
-        <!-- KONTEN UTAMA -->
-        <main class="flex-1 h-full overflow-y-auto pb-24 md:pb-0 relative scroll-smooth" id="content-area">
-            <!-- Halaman dirender di sini -->
-        </main>
+        <main class="flex-1 h-full overflow-y-auto pb-24 md:pb-0 relative scroll-smooth" id="content-area"></main>
 
-        <!-- BOTTOM NAV (Mobile) -->
         <nav class="glass md:hidden fixed bottom-0 left-0 w-full border-t border-slate-200 z-20 pb-safe">
-            <div class="flex justify-around items-center h-16 px-2" id="nav-mobile">
-                <!-- Injected via JS -->
-            </div>
+            <div class="flex justify-around items-center h-16 px-2" id="nav-mobile"></div>
         </nav>
     </div>
 
-    <!-- APP LOGIC & FIREBASE -->
-   <!-- APP LOGIC & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
-        // 1. CONFIG
+        // 1. CONFIG FIREBASE (Ubah IS_PREVIEW = false saat live)
         // ==========================================
-        let IS_PREVIEW = false; // BISA DIUBAH JADI false NANTI
+        let IS_PREVIEW = false; 
         
       const firebaseConfig = {
   apiKey: "AIzaSyDFxaM-yDYs_dlHfspUdbVk2akceTiGRII",
@@ -172,8 +136,9 @@
   appId: "1:479954097658:web:e542707151e3ad70e48043",
   measurementId: "G-LCFE1827CG"
 };
+
+
         let app, auth, db;
-        // Pelindung Error Firebase
         try {
             if (!IS_PREVIEW) {
                 app = initializeApp(firebaseConfig);
@@ -187,58 +152,79 @@
         }
 
         // ==========================================
-        // 2. DATA LAYANAN
+        // 2. DATA LAYANAN SESUAI PDF (DOKUMEN SP)
         // ==========================================
         const layananData = {
             'SP-01': {
-                judul: 'Asistensi & Konsultasi Perizinan SFR',
-                deskripsi: 'Pelayanan tatap muka dan daring untuk perbantuan perizinan.',
-                icon: 'fa-satellite-dish',
-                tema: { border: 'border-blue-500', bg: 'bg-blue-100', text: 'text-blue-600' },
-                ringkasan: { persyaratan: ['Data diri.', 'Detail jenis layanan SFR.'], prosedur: ['Penyampaian.', 'Pencatatan.', 'Asistensi.'], waktu: 'Maksimal 1 hari.', biaya: 'Gratis', produk: 'Laporan asistensi.', kanal: 'Loket, Telp, WA' },
-                indikator: ['Kemudahan akses kanal (Loket/Telepon/WA).', 'Kejelasan informasi persyaratan.', 'Penjelasan mekanisme oleh petugas.', 'Kompetensi dan keramahan petugas.', 'Kecepatan respons (1 hari).']
+                judul: 'Asistensi & Konsultasi Perizinan SFR dan Sertifikasi Operator Radio',
+                deskripsi: 'SK No 40 Tahun 2023 - Pelayanan asistensi perizinan spektrum frekuensi radio dan sertifikasi operator radio.',
+                icon: 'fa-user-tie',
+                tema: { border: 'border-blue-500', bg: 'bg-blue-100', text: 'text-blue-600', ring: 'focus:ring-blue-500' },
+                ringkasan: {
+                    persyaratan: 'Permohonan dilengkapi data diri yang masih berlaku, jenis layanan, dan status permintaan.',
+                    prosedur: 'Melalui 3 kanal (Loket/Telepon/WA) -> Petugas mencatat -> Pemberian Asistensi -> Bantuan Perizinan -> Laporan.',
+                    waktu: 'Maksimal 1 (satu) hari kerja.',
+                    biaya: 'Tanpa biaya (gratis).',
+                }
             },
             'SP-02': {
-                judul: 'UNAR & Sertifikasi Operator Radio',
-                deskripsi: 'Pelaksanaan ujian negara amatir radio dan sertifikasi.',
-                icon: 'fa-broadcast-tower',
-                tema: { border: 'border-purple-500', bg: 'bg-purple-100', text: 'text-purple-600' },
-                ringkasan: { persyaratan: ['Akun e-Licensing.', 'KTP & Foto.', 'Rekomendasi.'], prosedur: ['Daftar online.', 'Verifikasi.', 'Ujian CAT.', 'Pengumuman.'], waktu: '1 hari kerja.', biaya: 'Sesuai Tarif PNBP.', produk: 'Hasil Kelulusan.', kanal: 'e-Licensing, Aplikasi CAT.' },
-                indikator: ['Kemudahan registrasi online.', 'Kejelasan jadwal dan syarat.', 'Kelancaran ujian sistem CAT.', 'Profesionalisme panitia.', 'Kecepatan pengumuman kelulusan.']
+                judul: 'Penyelenggaraan Ujian Negara Amatir Radio (UNAR)',
+                deskripsi: 'SK No 41 Tahun 2023 - Pelaksanaan ujian negara bagi calon amatir radio menggunakan sistem CAT.',
+                icon: 'fa-laptop-code',
+                tema: { border: 'border-purple-500', bg: 'bg-purple-100', text: 'text-purple-600', ring: 'focus:ring-purple-500' },
+                ringkasan: {
+                    persyaratan: 'Registrasi e-Licensing, KTP, Pas Foto latar merah, Surat Rekomendasi Organisasi.',
+                    prosedur: 'Daftar online (iar-ikrap.postel.go.id) -> Pilih jadwal -> Verifikasi -> Ujian CAT -> Pengumuman.',
+                    waktu: '1 (satu) hari.',
+                    biaya: 'Sesuai Tarif PNBP (PP Nomor 43 Tahun 2023).',
+                }
             },
             'SP-03': {
-                judul: 'Penanganan Gangguan SFR',
-                deskripsi: 'Penanganan aduan gangguan frekuensi radio berskala prioritas.',
+                judul: 'Penanganan Gangguan Penggunaan Spektrum Frekuensi Radio',
+                deskripsi: 'SK No 42 Tahun 2023 - Pelayanan penanganan laporan aduan gangguan penggunaan frekuensi radio.',
                 icon: 'fa-exclamation-triangle',
-                tema: { border: 'border-rose-500', bg: 'bg-rose-100', text: 'text-rose-600' },
-                ringkasan: { persyaratan: ['Laporan detail.', 'Salinan ISR.', 'Bukti dukung.'], prosedur: ['Laporan.', 'Klarifikasi.', 'Analisa.', 'Pelacakan.', 'Tindakan.'], waktu: 'Sesuai klasifikasi.', biaya: 'Gratis', produk: 'Berita Acara.', kanal: 'Web Lapor, Call Center 159.' },
-                indikator: ['Kemudahan lapor melalui kanal resmi.', 'Kejelasan persyaratan bukti dukung.', 'Kecepatan respons petugas awal.', 'Transparansi proses pelacakan.', 'Kejelasan informasi hasil akhir.']
+                tema: { border: 'border-rose-500', bg: 'bg-rose-100', text: 'text-rose-600', ring: 'focus:ring-rose-500' },
+                ringkasan: {
+                    persyaratan: 'Surat/Laporan Pengaduan, Nomor Salinan ISR (jika berizin), Bukti dukung (foto/video/rekaman).',
+                    prosedur: 'Laporan Luring/Daring -> Klarifikasi -> Analisa Sumber -> Inspeksi -> Pelacakan -> Penindakan.',
+                    waktu: 'Sesuai klasifikasi gangguan (Perdirjen No 6 Tahun 2020).',
+                    biaya: 'Tanpa biaya (gratis).',
+                }
             }
         };
 
+        // KOMPONEN PENILAIAN SESUAI TABEL DOKUMEN (No 2 - 14)
+        const komponenSP = [
+            "Persyaratan Pelayanan",
+            "Sistem, Mekanisme, dan Prosedur",
+            "Jangka Waktu Penyelesaian",
+            "Biaya / Tarif",
+            "Produk Pelayanan",
+            "Sarana, Prasarana, dan/atau Fasilitas",
+            "Kompetensi Pelaksana",
+            "Pengawas Internal",
+            "Penanganan Pengaduan, Saran, dan Masukan",
+            "Jumlah Pelaksana",
+            "Jaminan Pelayanan",
+            "Jaminan Keamanan dan Keselamatan Pelayanan",
+            "Evaluasi Kinerja Pelaksana"
+        ];
+
         // ==========================================
-        // 3. UI UTILITIES
+        // 3. UI UTILITIES & STATE
         // ==========================================
         let currentUserRole = null;
-        let stakeholderName = '';
+        let stakeholderData = { nama: '', jabatan: '', instansi: '' };
 
-        window.showLoader = (msg='Memproses') => { 
-            document.getElementById('loader-text').innerText=msg; 
-            document.getElementById('global-loader').classList.remove('hidden'); 
-        }
+        window.showLoader = (msg='Memproses') => { document.getElementById('loader-text').innerText=msg; document.getElementById('global-loader').classList.remove('hidden'); }
         window.hideLoader = () => { document.getElementById('global-loader').classList.add('hidden'); }
-        
         window.showToast = (msg, type='info') => {
-            const t = document.getElementById('toast');
-            const c = document.getElementById('toast-content');
+            const t = document.getElementById('toast'), c = document.getElementById('toast-content');
             document.getElementById('toast-msg').innerText = msg;
-            
             if(type==='error') c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-red-500 text-red-600 bg-red-50/90';
             else if(type==='success') c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-green-500 text-green-700 bg-green-50/90';
             else c.className = 'glass px-6 py-3 rounded-full font-medium flex items-center gap-3 shadow-lg border-blue-500 text-blue-700 bg-blue-50/90';
-            
-            t.classList.remove('opacity-0', '-translate-y-5');
-            setTimeout(() => t.classList.add('opacity-0', '-translate-y-5'), 3500);
+            t.classList.remove('opacity-0', '-translate-y-5'); setTimeout(() => t.classList.add('opacity-0', '-translate-y-5'), 3500);
         }
 
         window.switchLoginTab = (t) => {
@@ -248,88 +234,54 @@
             document.getElementById('tab-admin').className = t==='admin' ? 'flex-1 py-2.5 text-sm font-semibold rounded-lg shadow-sm bg-white text-indigo-600' : 'flex-1 py-2.5 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700';
         }
 
-        // ==========================================
-        // 4. AUTHENTICATION
-        // ==========================================
         window.loginStakeholder = () => {
-            const val = document.getElementById('instansi-input').value.trim();
-            if(!val) return showToast('Mohon isi Nama Instansi Anda.', 'error');
+            const nama = document.getElementById('sh-nama').value.trim();
+            const jabatan = document.getElementById('sh-jabatan').value.trim();
+            const instansi = document.getElementById('sh-instansi').value.trim();
             
-            stakeholderName = val;
+            if(!nama || !jabatan || !instansi) return showToast('Mohon lengkapi semua isian (Nama, Jabatan, Instansi).', 'error');
+            
+            stakeholderData = { nama, jabatan, instansi };
             currentUserRole = 'stakeholder';
-            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('login-view').classList.add('hidden'); 
             document.getElementById('main-layout').classList.remove('hidden');
-            setupNavigation();
-            navigate('beranda-stakeholder');
-            showToast(`Selamat datang, ${stakeholderName}`, 'success');
+            setupNavigation(); 
+            navigate('beranda-stakeholder'); 
+            showToast(`Selamat datang, ${stakeholderData.nama}`, 'success');
         }
 
         window.loginAdmin = async () => {
-            const e = document.getElementById('admin-email').value;
-            const p = document.getElementById('admin-password').value;
+            const e = document.getElementById('admin-email').value, p = document.getElementById('admin-password').value;
             if(!e || !p) return showToast('Isi Email & Password', 'error');
-            
             showLoader('Login...');
             try {
-                if(IS_PREVIEW) { 
-                    if(e!=='admin@test.com' || p!=='123456') throw new Error('Preview: Coba admin@test.com / 123456'); 
-                } else {
-                    await signInWithEmailAndPassword(auth, e, p);
-                }
-                currentUserRole = 'admin';
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('main-layout').classList.remove('hidden');
-                setupNavigation();
-                navigate('hasil-review');
-            } catch (err) { showToast(err.message, 'error'); }
-            finally { hideLoader(); }
+                if(IS_PREVIEW) { if(e!=='admin@test.com' || p!=='123456') throw new Error('Preview: Coba admin@test.com / 123456'); } 
+                else { await signInWithEmailAndPassword(auth, e, p); }
+                currentUserRole = 'admin'; document.getElementById('login-view').classList.add('hidden'); document.getElementById('main-layout').classList.remove('hidden');
+                setupNavigation(); navigate('hasil-review');
+            } catch (err) { showToast(err.message, 'error'); } finally { hideLoader(); }
         }
 
         window.logout = () => {
             if(!IS_PREVIEW && currentUserRole==='admin') signOut(auth);
-            currentUserRole = null; 
-            document.getElementById('main-layout').classList.add('hidden'); 
-            document.getElementById('login-view').classList.remove('hidden');
+            currentUserRole = null; document.getElementById('main-layout').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden');
         }
 
-        // ==========================================
-        // 5. NAVIGATION
-        // ==========================================
         const menuConfig = {
-            stakeholder: [
-                { id: 'beranda-stakeholder', icon: 'fa-table-cells-large', label: 'Dashboard Layanan' },
-                { id: 'form-review', icon: 'fa-clipboard-check', label: 'Isi Kuesioner' }
-            ],
-            admin: [
-                { id: 'hasil-review', icon: 'fa-chart-pie', label: 'Matriks & Ekspor' }
-            ]
+            stakeholder: [{ id: 'beranda-stakeholder', icon: 'fa-file-pdf', label: 'Dokumen SP' }, { id: 'form-review', icon: 'fa-clipboard-list', label: 'Form Reviu Kebijakan' }],
+            admin: [{ id: 'hasil-review', icon: 'fa-chart-pie', label: 'Matriks & Ekspor' }]
         };
 
         const setupNavigation = () => {
-            const roleEl = document.getElementById('sidebar-role');
-            roleEl.innerHTML = currentUserRole === 'admin' ? 
-                '<span class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-200"><i class="fas fa-shield-alt mr-1"></i> Admin Internal</span>' : 
-                `<span class="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 block truncate" title="${stakeholderName}"><i class="fas fa-building mr-1"></i> ${stakeholderName}</span>`;
-
-            const menus = menuConfig[currentUserRole];
+            const roleHtml = currentUserRole === 'admin' 
+                ? '<span class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-200"><i class="fas fa-shield-alt mr-1"></i> Admin Internal</span>' 
+                : `<div class="bg-blue-50 border border-blue-100 p-3 rounded-xl"><p class="text-[11px] font-bold text-blue-500 uppercase tracking-wider mb-1">Profil Penilai</p><p class="text-sm font-bold text-slate-800 line-clamp-1" title="${stakeholderData.nama}">${stakeholderData.nama}</p><p class="text-xs text-slate-600 mt-0.5 line-clamp-1" title="${stakeholderData.jabatan} - ${stakeholderData.instansi}">${stakeholderData.jabatan} <br><span class="font-medium text-slate-500">${stakeholderData.instansi}</span></p></div>`;
+            document.getElementById('sidebar-role').innerHTML = roleHtml;
             
-            document.getElementById('nav-desktop').innerHTML = menus.map(m => `
-                <button onclick="navigate('${m.id}')" id="navD-${m.id}" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left font-medium text-slate-500 hover:bg-slate-100/50 hover:text-blue-600 transition-all border border-transparent">
-                    <i class="fas ${m.icon} w-5 text-center text-lg"></i> ${m.label}
-                </button>
-            `).join('');
-
-            let mobileMenus = [...menus];
-            if(currentUserRole === 'admin') mobileMenus.push({id:'logout', icon:'fa-power-off', label:'Keluar'});
+            document.getElementById('nav-desktop').innerHTML = menuConfig[currentUserRole].map(m => `<button onclick="navigate('${m.id}')" id="navD-${m.id}" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left font-medium text-slate-500 hover:bg-slate-100/50 hover:text-blue-600 transition-all border border-transparent"><i class="fas ${m.icon} w-5 text-center text-lg"></i> ${m.label}</button>`).join('');
             
-            document.getElementById('nav-mobile').innerHTML = mobileMenus.map(m => {
-                if(m.id === 'logout') return `<button onclick="logout()" class="flex flex-col items-center w-16 text-red-500"><i class="fas ${m.icon} text-xl mb-1"></i><span class="text-[10px] font-bold">Keluar</span></button>`;
-                return `
-                <button onclick="navigate('${m.id}')" id="navM-${m.id}" class="flex flex-col items-center w-20 py-1 text-slate-400 hover:text-blue-600 transition-colors">
-                    <i class="fas ${m.icon} text-xl mb-1 transition-transform"></i>
-                    <span class="text-[10px] font-bold text-center leading-tight">${m.label}</span>
-                </button>
-            `}).join('');
+            let mobileMenus = [...menuConfig[currentUserRole]]; if(currentUserRole === 'admin') mobileMenus.push({id:'logout', icon:'fa-power-off', label:'Keluar'});
+            document.getElementById('nav-mobile').innerHTML = mobileMenus.map(m => { if(m.id === 'logout') return `<button onclick="logout()" class="flex flex-col items-center w-16 text-red-500"><i class="fas ${m.icon} text-xl mb-1"></i><span class="text-[10px] font-bold">Keluar</span></button>`; return `<button onclick="navigate('${m.id}')" id="navM-${m.id}" class="flex flex-col items-center w-20 py-1 text-slate-400 hover:text-blue-600 transition-colors"><i class="fas ${m.icon} text-xl mb-1 transition-transform"></i><span class="text-[10px] font-bold text-center leading-tight">${m.label}</span></button>`}).join('');
         };
 
         window.navigate = (pageId) => {
@@ -342,7 +294,7 @@
         };
 
         // ==========================================
-        // 6. PAGE RENDERER (UI/UX)
+        // 4. RENDERER (UI/UX)
         // ==========================================
         const renderPageContent = (pageId) => {
             const content = document.getElementById('content-area');
@@ -352,95 +304,75 @@
                 html = `
                     <div class="p-6 md:p-10 max-w-6xl mx-auto">
                         <header class="mb-10">
-                            <span class="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block tracking-widest uppercase">Executive Summary</span>
-                            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Standar Pelayanan Balmon</h2>
-                            <p class="text-slate-500 text-lg max-w-2xl">Silakan cermati spesifikasi dari ketiga layanan di bawah ini sebelum Anda memberikan penilaian di halaman kuesioner.</p>
+                            <span class="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block tracking-widest uppercase">Dokumen Standar Pelayanan</span>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Executive Summary</h2>
+                            <p class="text-slate-500 text-lg max-w-3xl">Silakan cermati spesifikasi dari 3 dokumen SK Standar Pelayanan di bawah ini. Sebagai Stakeholder, Anda diminta memberikan reviu kualitatif pada Komponen No. 2 s.d 14 di masing-masing dokumen.</p>
                         </header>
 
-                        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-10">
+                        <div class="grid gap-6 md:grid-cols-3 mb-10">
                             ${Object.keys(layananData).map(k => `
                                 <div class="glass-card bento-hover p-6 rounded-[24px] ${layananData[k].tema.border} border-t-4 flex flex-col h-full bg-white relative overflow-hidden group">
-                                    <div class="w-14 h-14 ${layananData[k].tema.bg} rounded-2xl flex items-center justify-center mb-5 ${layananData[k].tema.text} text-2xl group-hover:scale-110 transition-transform">
-                                        <i class="fas ${layananData[k].icon}"></i>
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="w-12 h-12 ${layananData[k].tema.bg} rounded-2xl flex items-center justify-center ${layananData[k].tema.text} text-xl group-hover:scale-110 transition-transform"><i class="fas ${layananData[k].icon}"></i></div>
+                                        <span class="bg-slate-100 text-slate-500 text-xs font-bold px-2 py-1 rounded">${k}</span>
                                     </div>
                                     <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">${layananData[k].judul}</h3>
-                                    <p class="text-sm text-slate-500 mb-6 flex-1">${layananData[k].deskripsi}</p>
-                                    
-                                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-3">
-                                        <div class="flex items-start gap-3">
-                                            <i class="fas fa-clock text-slate-400 mt-1 text-sm"></i>
-                                            <div>
-                                                <p class="text-[10px] uppercase font-bold text-slate-400">Waktu Pelayanan</p>
-                                                <p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.waktu}</p>
-                                            </div>
-                                        </div>
+                                    <p class="text-[11px] text-blue-600 font-semibold mb-4 border-b pb-3">${layananData[k].deskripsi}</p>
+                                    <div class="space-y-3 flex-1">
+                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">2. Persyaratan</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.persyaratan}</p></div>
+                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">3. Prosedur</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.prosedur}</p></div>
+                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">4. Waktu</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.waktu}</p></div>
+                                        <div><p class="text-[10px] uppercase font-bold text-slate-400">5. Biaya</p><p class="text-xs font-medium text-slate-700">${layananData[k].ringkasan.biaya}</p></div>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
 
                         <div class="glass p-8 rounded-3xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-lg">Sudah membaca ringkasan layanan?</h4>
-                                <p class="text-slate-600 text-sm mt-1">Lanjutkan ke formulir untuk memberikan masukan Anda.</p>
-                            </div>
-                            <button onclick="navigate('form-review')" class="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl font-semibold transition-all shadow-lg shadow-slate-900/20 active:scale-95 whitespace-nowrap">
-                                Mulai Kuesioner <i class="fas fa-arrow-right ml-2"></i>
-                            </button>
+                            <div><h4 class="font-bold text-slate-800 text-lg">Siap memberikan reviu?</h4><p class="text-slate-600 text-sm mt-1">Lanjutkan ke formulir reviu kebijakan untuk menilai komponen SP secara formal.</p></div>
+                            <button onclick="navigate('form-review')" class="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl font-semibold transition-all shadow-lg active:scale-95">Buka Form Reviu <i class="fas fa-arrow-right ml-2"></i></button>
                         </div>
                     </div>
                 `;
             } 
             else if (pageId === 'form-review') {
                 html = `
-                    <div class="p-6 md:p-10 max-w-4xl mx-auto pb-28">
+                    <div class="p-6 md:p-10 max-w-5xl mx-auto pb-28">
                         <header class="mb-8">
-                            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Formulir Kuesioner</h2>
+                            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Formulir Reviu Standar Pelayanan</h2>
+                            <p class="text-slate-500 text-lg">Penilaian dan masukan formal terhadap dokumen SK Standar Pelayanan.</p>
                         </header>
                         
                         <div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]">
-                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
-                                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">1</div>
-                                <div><h3 class="font-bold text-xl text-slate-800">Layanan yang Digunakan</h3></div>
-                            </div>
+                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">1</div><div><h3 class="font-bold text-xl text-slate-800">Pilih Dokumen Layanan</h3><p class="text-sm text-slate-500">Centang dokumen SP yang akan Anda reviu (bisa lebih dari satu):</p></div></div>
                             <div class="space-y-3 pl-14">
-                                ${Object.keys(layananData).map(k => `
-                                    <label class="flex items-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                                        <input type="checkbox" class="cb-layanan w-5 h-5 text-blue-600" value="${k}" onchange="generateQuestions()">
-                                        <span class="ml-4 font-medium text-slate-700">${layananData[k].judul}</span>
-                                    </label>
-                                `).join('')}
+                                ${Object.keys(layananData).map(k => `<label class="flex items-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors"><input type="checkbox" class="cb-layanan w-5 h-5 text-blue-600" value="${k}" onchange="generateQuestions()"><span class="ml-4 font-medium text-slate-700">${layananData[k].judul}</span></label>`).join('')}
                             </div>
                         </div>
 
                         <div id="q-container"></div>
 
                         <div id="final-container" class="hidden glass-card p-6 md:p-8 mb-8 rounded-[24px]">
-                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
-                                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">3</div>
-                                <div><h3 class="font-bold text-xl text-slate-800">Kesimpulan Akhir</h3></div>
-                            </div>
+                            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">3</div><div><h3 class="font-bold text-xl text-slate-800">Kesimpulan Akhir Reviu</h3></div></div>
                             <div class="space-y-6 pl-14 mb-8">
-                                <div><label class="block text-sm font-semibold mb-2">Apa yang sudah baik?</label><textarea id="essay_baik" rows="2" class="w-full p-4 border rounded-xl"></textarea></div>
-                                <div><label class="block text-sm font-semibold mb-2">Usulan penyempurnaan?</label><textarea id="essay_usulan" rows="3" class="w-full p-4 border rounded-xl"></textarea></div>
+                                <div><label class="block text-sm font-semibold mb-2 text-slate-700">Secara umum, bagian mana yang sudah baik dan patut dipertahankan?</label><textarea id="essay_baik" rows="2" class="w-full p-4 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
+                                <div><label class="block text-sm font-semibold mb-2 text-slate-700">Kesimpulan atau catatan penutup dari Anda terkait Standar Pelayanan ini?</label><textarea id="essay_usulan" rows="3" class="w-full p-4 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
                             </div>
                             <div class="bg-blue-50 p-6 rounded-2xl border-blue-100 pl-14 ml-14">
-                                <label class="block font-bold text-blue-900 mb-4">Pilih Kesimpulan:</label>
-                                ${['Setuju tanpa perbaikan', 'Setuju dengan perbaikan minor', 'Perlu dilakukan perbaikan'].map(v => `
-                                    <label class="flex items-center gap-3 cursor-pointer p-2"><input type="radio" name="kesimpulan" value="${v}" class="w-4 h-4 text-blue-600"><span class="font-medium text-blue-900">${v}</span></label>
-                                `).join('')}
+                                <label class="block font-bold text-blue-900 mb-4">Status Pengesahan Stakeholder terhadap Dokumen SP:</label>
+                                ${['Disetujui tanpa perubahan', 'Disetujui dengan catatan penyesuaian', 'Perlu dilakukan perubahan/revisi mendalam'].map(v => `<label class="flex items-center gap-3 cursor-pointer p-3 bg-white mb-2 border border-blue-100 hover:border-blue-300 rounded-xl transition-colors"><input type="radio" name="kesimpulan" value="${v}" class="w-4 h-4 text-blue-600"><span class="font-semibold text-blue-900">${v}</span></label>`).join('')}
                             </div>
                         </div>
 
-                        <button id="btn-submit" onclick="submitReview()" class="hidden w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg">Kirim Form Review</button>
+                        <button id="btn-submit" onclick="submitReview()" class="hidden w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 flex justify-center items-center gap-2"><i class="fas fa-paper-plane"></i> Kirim Dokumen Reviu</button>
                     </div>
                 `;
             }
             else if (pageId === 'hasil-review') {
                 html = `
-                    <div class="p-6 md:p-10 h-full flex flex-col"><div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-extrabold">Matriks Review</h2><button onclick="window.exportToCSV()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg"><i class="fas fa-file-csv"></i> Ekspor CSV</button></div>
-                    <div class="glass-card flex-1 overflow-auto shadow-sm rounded-2xl border-t-4 border-indigo-500"><table class="w-full text-left"><thead class="bg-slate-50 text-slate-600 border-b"><th class="p-4">Instansi</th><th class="p-4">Layanan</th><th class="p-4">Usulan Utama</th><th class="p-4">Kesimpulan</th></thead>
-                    <tbody id="table-reviews"><tr><td colspan="4" class="p-8 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div></div>
+                    <div class="p-6 md:p-10 h-full flex flex-col"><div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-extrabold text-slate-900">Rekapitulasi Reviu SP</h2><button onclick="window.exportToCSV()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-green-700"><i class="fas fa-file-csv"></i> Ekspor CSV Detail</button></div>
+                    <div class="glass-card flex-1 overflow-auto shadow-sm rounded-2xl border-t-4 border-indigo-500"><table class="w-full text-left"><thead class="bg-slate-50 text-slate-600 border-b text-sm"><th class="p-4">Profil Stakeholder</th><th class="p-4">Layanan Direviu</th><th class="p-4">Kesimpulan / Status</th><th class="p-4 text-center">Waktu Submit</th></thead>
+                    <tbody id="table-reviews" class="divide-y divide-slate-100"><tr><td colspan="4" class="p-8 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div></div>
                 `;
                 setTimeout(loadReviewsData, 100);
             }
@@ -448,83 +380,120 @@
         };
 
         // ==========================================
-        // 7. FORM LOGIC & DATABASE
+        // 5. GENERATE REVIU FORM KUALITATIF (KOMPONEN 2 - 14)
         // ==========================================
+        window.toggleTextarea = (id, val) => {
+            const ta = document.getElementById(id);
+            if(val !== 'Sesuai') { ta.classList.add('show'); ta.setAttribute('required', 'true'); } 
+            else { ta.classList.remove('show'); ta.removeAttribute('required'); ta.value = ''; }
+        };
+
         window.generateQuestions = () => {
             const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
-            const c = document.getElementById('q-container');
-            const f = document.getElementById('final-container');
-            const b = document.getElementById('btn-submit');
+            const c = document.getElementById('q-container'); const f = document.getElementById('final-container'); const b = document.getElementById('btn-submit');
             if(!sel.length) { c.innerHTML=''; f.classList.add('hidden'); b.classList.add('hidden'); return; }
 
-            let html = `<div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]"><div class="flex items-center gap-4 mb-6 border-b pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">2</div><div><h3 class="font-bold text-xl text-slate-800">Penilaian Skala Kuantitatif</h3><p class="text-sm text-slate-500">Skala: 1 (Tidak Baik) - 4 (Sangat Baik)</p></div></div>`;
+            let html = `<div class="glass-card p-6 md:p-8 mb-8 rounded-[24px]"><div class="flex items-center gap-4 mb-6 border-b pb-4"><div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">2</div><div><h3 class="font-bold text-xl text-slate-800">Reviu Komponen Dokumen Standar Pelayanan</h3><p class="text-sm text-slate-500">Silakan beri penilaian kebijakan (No. 2 s/d 14). Berikan catatan apabila memilih 'Perlu Perubahan'.</p></div></div>`;
+            
             sel.forEach(k => {
                 const l = layananData[k];
-                html += `<div class="ml-14 mb-8 p-6 border rounded-2xl bg-slate-50/50"><h4 class="font-bold ${l.tema.text} mb-5 flex items-center gap-2"><i class="fas ${l.icon}"></i> ${l.judul}</h4><div class="space-y-6">` +
-                l.indikator.map((ind, idx) => `<div><p class="text-sm font-medium text-slate-700 mb-3">${idx+1}. ${ind}</p><div class="flex gap-2 scale-radio max-w-md">${[1,2,3,4].map(v => `<div class="flex-1"><input type="radio" id="s_${k}_${idx}_${v}" name="s_${k}_${idx}" value="${v}" class="hidden" required><label for="s_${k}_${idx}_${v}" class="block text-center py-2.5 border bg-white rounded-lg cursor-pointer text-sm font-bold shadow-sm">${v}</label></div>`).join('')}</div></div>`).join('') + `</div></div>`;
+                html += `<div class="ml-14 mb-10 p-6 border rounded-2xl bg-slate-50/50"><h4 class="font-bold ${l.tema.text} mb-6 flex items-center gap-2 pb-3 border-b border-slate-200"><i class="fas ${l.icon} text-xl"></i> ${l.judul}</h4><div class="space-y-6">` +
+                komponenSP.map((komp, idx) => `
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-sm font-bold text-slate-800 mb-3">${idx+2}. ${komp}</p>
+                        <div class="grid md:grid-cols-3 gap-3">
+                            ${['Sesuai', 'Sesuai dengan Catatan', 'Perlu Perubahan'].map(v => `
+                                <label class="status-radio cursor-pointer relative">
+                                    <input type="radio" name="st_${k}_${idx}" value="${v}" class="sr-only" onchange="toggleTextarea('ta_${k}_${idx}', this.value)" required>
+                                    <div class="flex items-center p-3 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-all h-full">
+                                        <span class="radio-dot w-4 h-4 rounded-full border-2 border-slate-300 mr-3 flex-shrink-0 transition-colors"></span>
+                                        <span class="text-xs font-semibold text-slate-700 leading-tight">${v}</span>
+                                    </div>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <textarea id="ta_${k}_${idx}" rows="2" class="textarea-collapse w-full p-3 border border-slate-300 rounded-lg bg-white outline-none ${l.tema.ring} text-sm" placeholder="Tuliskan catatan/alasan spesifik atau usulan redaksional Anda pada komponen ini..."></textarea>
+                    </div>
+                `).join('') + `</div></div>`;
             });
             c.innerHTML = html + `</div>`; f.classList.remove('hidden'); b.classList.remove('hidden');
         };
 
         window.submitReview = async () => {
-            if(IS_PREVIEW) {
-                document.getElementById('content-area').innerHTML = `<div class="p-10 text-center"><h2 class="text-3xl font-bold">Terima Kasih!</h2><p>Data sukses tersimpan (Mode Preview).</p></div>`;
-                return;
-            }
-            
-            // Collect Data
             const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
-            let complete = true; const skala = {};
+            let complete = true; const hasilReviu = {};
+            
             sel.forEach(k => {
-                layananData[k].indikator.forEach((_, i) => {
-                    const c = document.querySelector(`input[name="s_${k}_${i}"]:checked`);
-                    if(!c) complete = false; else { if(!skala[k]) skala[k]={}; skala[k][`ind_${i}`] = parseInt(c.value); }
+                hasilReviu[k] = {};
+                komponenSP.forEach((komp, i) => {
+                    const c = document.querySelector(`input[name="st_${k}_${i}"]:checked`);
+                    if(!c) complete = false; 
+                    else { 
+                        const catatan = document.getElementById(`ta_${k}_${i}`).value.trim();
+                        // Jika memilih selain Sesuai, wajib isi catatan
+                        if(c.value !== 'Sesuai' && catatan === '') complete = false;
+                        hasilReviu[k][`komp_${i+2}`] = { nama_komponen: komp, status: c.value, catatan: catatan || '-' }; 
+                    }
                 });
             });
             const kes = document.querySelector(`input[name="kesimpulan"]:checked`);
-            
-            if(!complete) return showToast('Lengkapi semua skala (1-4)', 'error');
+            if(!complete) return showToast('Harap pilih status tiap komponen. Isi catatan jika memilih "Perlu Perubahan".', 'error');
             if(!kes) return showToast('Pilih Kesimpulan Akhir', 'error');
 
-            showLoader();
+            showLoader('Mengirim Dokumen Reviu...');
             try {
-                await addDoc(collection(db, "reviews"), {
-                    nama_instansi: stakeholderName, layanan_dipilih: sel, penilaian_skala: skala,
-                    jawaban_terbuka: { usulan: document.getElementById('essay_usulan').value || '-' },
-                    kesimpulan_akhir: kes.value, timestamp: serverTimestamp()
-                });
-                document.getElementById('content-area').innerHTML = `<div class="p-10 text-center"><h2 class="text-3xl font-bold">Terima Kasih!</h2><p>Data sukses dikirim.</p></div>`;
-            } catch (e) { showToast('Gagal mengirim ke database', 'error'); }
-            finally { hideLoader(); }
+                const payload = {
+                    profil_penilai: stakeholderData, layanan_dipilih: sel, reviu_komponen: hasilReviu,
+                    catatan_akhir: { baik: document.getElementById('essay_baik').value || '-', usulan: document.getElementById('essay_usulan').value || '-' },
+                    kesimpulan_akhir: kes.value, timestamp: IS_PREVIEW ? new Date() : serverTimestamp()
+                };
+
+                if(!IS_PREVIEW) await addDoc(collection(db, "reviews"), payload);
+                else await new Promise(r => setTimeout(r, 1200)); // Simulasi delay
+                
+                document.getElementById('content-area').innerHTML = `<div class="h-full flex flex-col items-center justify-center p-6 text-center max-w-lg mx-auto"><div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mb-6"><i class="fas fa-file-signature"></i></div><h2 class="text-3xl font-bold text-slate-800 mb-3">Dokumen Reviu Terekam</h2><p class="text-slate-600 mb-8 leading-relaxed">Terima kasih <b>${stakeholderData.nama}</b>, reviu kebijakan terhadap Standar Pelayanan telah berhasil disubmit. Data Anda akan menjadi bahan evaluasi dan perbaikan formil kami.</p><button onclick="logout()" class="px-8 py-3.5 bg-white border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 shadow-sm transition-all active:scale-95">Selesai & Keluar</button></div>`;
+            } catch (e) { showToast('Gagal mengirim', 'error'); } finally { hideLoader(); }
         };
 
-        // ADMIN FETCHER
         let currentReviewsData = [];
         const loadReviewsData = async () => {
             const tbody = document.getElementById('table-reviews');
-            if(IS_PREVIEW) {
-                tbody.innerHTML = `<tr><td class="p-4 font-bold">PT Telkom</td><td class="p-4">SP-01</td><td class="p-4 italic">"Percepat layanan"</td><td class="p-4">Setuju</td></tr>`; return;
-            }
+            if(IS_PREVIEW) { tbody.innerHTML = `<tr class="hover:bg-slate-50"><td class="p-4"><p class="font-bold text-slate-800">Budi Santoso</p><p class="text-xs text-slate-500">Direktur - PT Demo</p></td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold border border-blue-200">SP-01</span></td><td class="p-4"><span class="bg-yellow-50 text-yellow-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-yellow-200 block w-max">Disetujui dengan catatan</span></td><td class="p-4 text-center text-xs text-slate-400">Baru saja</td></tr>`; return; }
             try {
-                const snap = await getDocs(collection(db, 'reviews'));
-                currentReviewsData = []; let html = '';
-                snap.forEach(d => {
-                    const dt = d.data(); currentReviewsData.push(dt);
-                    html += `<tr class="hover:bg-slate-50"><td class="p-4 font-bold text-slate-800">${dt.nama_instansi}</td><td class="p-4">${dt.layanan_dipilih.join(', ')}</td><td class="p-4 italic">"${dt.jawaban_terbuka.usulan}"</td><td class="p-4">${dt.kesimpulan_akhir}</td></tr>`;
+                const snap = await getDocs(collection(db, 'reviews')); currentReviewsData = []; let html = '';
+                snap.forEach(d => { 
+                    const dt = d.data(); currentReviewsData.push(dt); 
+                    const time = dt.timestamp ? new Date(dt.timestamp.toDate()).toLocaleDateString('id-ID') : '-';
+                    let kesBg = dt.kesimpulan_akhir.includes('tanpa') ? 'bg-green-50 text-green-700 border-green-200' : (dt.kesimpulan_akhir.includes('Perlu') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200');
+                    html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4"><p class="font-bold text-slate-800">${dt.profil_penilai.nama}</p><p class="text-xs text-slate-500">${dt.profil_penilai.jabatan} - <b>${dt.profil_penilai.instansi}</b></p></td><td class="p-4">${dt.layanan_dipilih.map(l=>`<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold border border-slate-200 mr-1 inline-block mb-1">${l}</span>`).join('')}</td><td class="p-4"><span class="${kesBg} px-3 py-1.5 rounded-lg text-[11px] font-bold border block w-max uppercase tracking-wide">${dt.kesimpulan_akhir}</span></td><td class="p-4 text-center text-xs font-medium text-slate-400">${time}</td></tr>`; 
                 });
-                tbody.innerHTML = html || '<tr><td colspan="4" class="p-8 text-center text-slate-500">Belum ada data masuk.</td></tr>';
+                tbody.innerHTML = html || '<tr><td colspan="4" class="p-8 text-center text-slate-500">Belum ada data reviu.</td></tr>';
             } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-red-500">Error memuat data</td></tr>`; }
         };
 
         window.exportToCSV = () => {
-            if(IS_PREVIEW) return showToast('Fitur Export (Preview)', 'success');
-            if(!currentReviewsData.length) return showToast('Data kosong', 'error');
-            let csv = "Instansi,Layanan,Usulan,Kesimpulan\n";
-            currentReviewsData.forEach(i => { csv += `"${i.nama_instansi}","${i.layanan_dipilih.join(', ')}","${i.jawaban_terbuka.usulan}","${i.kesimpulan_akhir}"\n`; });
-            const link = document.createElement("a"); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = "Hasil_Review.csv";
+            if(IS_PREVIEW) return showToast('Fitur Export Data Aktif (Preview)', 'success');
+            if(!currentReviewsData.length) return showToast('Tidak ada data untuk diekspor', 'error');
+            
+            // Format CSV Detail per Item
+            let csv = "Nama Penilai,Jabatan,Instansi,Dokumen SP,No Komponen,Nama Komponen,Status Reviu,Catatan/Alasan,Kesimpulan Dokumen\n";
+            currentReviewsData.forEach(dt => { 
+                const profil = `"${dt.profil_penilai.nama}","${dt.profil_penilai.jabatan}","${dt.profil_penilai.instansi}"`;
+                const kesimpulan = `"${dt.kesimpulan_akhir}"`;
+                
+                dt.layanan_dipilih.forEach(k => {
+                    const docName = `"${layananData[k].judul}"`;
+                    if(dt.reviu_komponen && dt.reviu_komponen[k]) {
+                        Object.keys(dt.reviu_komponen[k]).forEach(kompKey => {
+                            const item = dt.reviu_komponen[k][kompKey];
+                            csv += `${profil},${docName},"${kompKey.replace('komp_','')}","${item.nama_komponen}","${item.status}","${item.catatan.replace(/"/g, '""')}",${kesimpulan}\n`;
+                        });
+                    }
+                });
+            });
+            const link = document.createElement("a"); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = "Rekap_Reviu_Standar_Pelayanan.csv";
             document.body.appendChild(link); link.click(); link.remove();
         };
     </script>
 </body>
 </html>
-```eof
