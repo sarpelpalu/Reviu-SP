@@ -134,7 +134,7 @@
         import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIG FIREBASE (Pastikan Kode Terisi!)
+        // CONFIG FIREBASE (Ubah IS_PREVIEW = false saat live)
         // ==========================================
         let IS_PREVIEW = false; 
         
@@ -147,6 +147,7 @@
   appId: "1:479954097658:web:e542707151e3ad70e48043",
   measurementId: "G-LCFE1827CG"
 };
+
 
         let app, auth, db;
         try {
@@ -235,9 +236,11 @@
             "Evaluasi Kinerja Pelaksana"
         ];
 
+        // INI BARIS YANG HILANG SEBELUMNYA DAN SUDAH SAYA KEMBALIKAN:
         let currentUserRole = null;
         let stakeholderData = { nama: '', jabatan: '', instansi: '' };
         let signaturePad = null; 
+        let currentReviewsData = []; 
 
         window.showLoader = (msg='Memproses') => { document.getElementById('loader-text').innerText=msg; document.getElementById('global-loader').classList.remove('hidden'); }
         window.hideLoader = () => { document.getElementById('global-loader').classList.add('hidden'); }
@@ -425,12 +428,7 @@
         };
 
         window.clearSignature = () => { if(signaturePad) signaturePad.clear(); };
-
-        window.toggleTextarea = (id, val) => {
-            const ta = document.getElementById(id);
-            if(val !== 'Sesuai') { ta.classList.add('show'); ta.setAttribute('required', 'true'); } 
-            else { ta.classList.remove('show'); ta.removeAttribute('required'); ta.value = ''; }
-        };
+        window.toggleTextarea = (id, val) => { const ta = document.getElementById(id); if(val !== 'Sesuai') { ta.classList.add('show'); ta.setAttribute('required', 'true'); } else { ta.classList.remove('show'); ta.removeAttribute('required'); ta.value = ''; } };
 
         window.generateQuestions = () => {
             const sel = Array.from(document.querySelectorAll('.cb-layanan:checked')).map(c=>c.value);
@@ -461,7 +459,6 @@
                 `).join('') + `</div></div>`;
             });
             c.innerHTML = html + `</div>`; f.classList.remove('hidden'); b.classList.remove('hidden');
-            
             setTimeout(initSignaturePad, 100);
         };
 
@@ -549,7 +546,7 @@
 
                         html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center font-bold text-slate-500">${no++}</td><td class="p-4"><p class="font-bold text-slate-800">${namaUser}</p><p class="text-xs text-slate-500">${jabatanUser} - <b>${instansiUser}</b></p></td><td class="p-4">${layananListHtml}</td><td class="p-4"><span class="${kesBg} px-3 py-1.5 rounded-lg text-[11px] font-bold border block w-max uppercase tracking-wide">${kesimpulan}</span></td><td class="p-4 text-center"><p class="text-xs font-bold text-slate-700">${dtFormat.date}</p><p class="text-[10px] text-slate-500">${dtFormat.time}</p>${ttdHtml}</td></tr>`; 
                     } catch (rowError) {
-                        console.warn("Ada satu baris gagal dimuat:", rowError); // Abaikan baris rusak
+                        console.warn("Ada satu baris gagal dimuat:", rowError); 
                     }
                 });
                 
@@ -558,7 +555,6 @@
             } catch (e) { 
                 console.error("Gagal getDocs:", e);
                 
-                // Menangkap pesan error asli (Penting untuk cek izin Firebase)
                 let errMsg = e.message || '';
                 let htmlError = '';
                 
@@ -576,7 +572,7 @@
 
         window.exportToCSV = () => {
             if(IS_PREVIEW) return showToast('Fitur Export Data Aktif (Preview)', 'success');
-            if(!currentReviewsData.length) return showToast('Tidak ada data untuk diekspor', 'error');
+            if(!currentReviewsData || currentReviewsData.length === 0) return showToast('Tidak ada data untuk diekspor', 'error');
             
             let csv = "No,Tanggal Pengisian,Waktu,Nama Penilai,Jabatan,Instansi,Dokumen SP,No Komponen,Nama Komponen,Status Reviu,Catatan/Alasan,Kesimpulan Dokumen,Tanda Tangan Digital (Base64)\n";
             
